@@ -4,9 +4,12 @@ import Password from '../inputfields/Password';
 import axios from 'axios';
 import "../App.css";
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Landing2 = () => {
-  const [videoSource, setVideoSource] = useState("/vid.mp4");
+  const [videoSource] = useState("/vid.mp4");
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
@@ -62,12 +65,12 @@ const Landing2 = () => {
       const response = await axios.post("https://shoppingserver-q9kv.onrender.com/user/register", userData);
       console.log(response);
       if (response.data === "Registered successfully") {
-        alert("OTP sent to your mail-id: " + user.useremail);
+        toast.success(`OTP sent to your mail-id: ${user.useremail}`);
         setChange((prevstate) => ({ ...prevstate, otpverify: !change.otpverify, register: !change.register }));
       } else if (response.data === "Account already exists") {
-        alert("Account already exists.");
+         toast.error("Account already exists.");
       } else {
-        alert(response.data.message || "Registration failed. Please try again.");
+        toast.error(response.data.message || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -76,7 +79,8 @@ const Landing2 = () => {
 
   const verifyotp = async (e) => {
     if (user.userotp === "") {
-      alert("Please enter the OTP.");
+      toast.info("Please enter the OTP.");
+
       return;
     }
     e.preventDefault();
@@ -88,14 +92,16 @@ const Landing2 = () => {
       const response = await axios.post(`https://shoppingserver-q9kv.onrender.com/user/verify-otp/${userData.useremail}/${userData.userotp}`);
       console.log(response);
       if (response.data === "User verified") {
-        alert("User " + user.username + " verified");
+        toast.info(`User ${user.username} verified`);
+
         setChange((prevstate) => ({
           ...prevstate,
           setpassword: true,
           otpverify: false
         }));
       } else {
-        alert(response.data.message || "Invalid OTP. Please try again.");
+        toast.error(response.data.message || "Invalid OTP. Please try again.");
+
       }
     } catch (error) {
       console.error("Error:", error);
@@ -130,7 +136,7 @@ const Landing2 = () => {
       const response = await axios.post(`https://shoppingserver-q9kv.onrender.com/user/setpassword/${userData.useremail}/${userData.userpassword}`);
       console.log(response);
       if (response.data === "Password has been set successfully.") {
-        alert("Signup successful!");
+        toast.success("Signup successful. Please login to continue.");
         localStorage.setItem('allinall', 'true');
         localStorage.setItem('useremail', user.useremail);
         setChange((prevstate) => ({
@@ -140,7 +146,8 @@ const Landing2 = () => {
           setpassword: false
         }));
       } else {
-        alert(response.data.message || "Signup failed. Please try again.");
+        toast.error(response.data.message || "Signup failed. Please try again.");
+
       }
       setUser({
         username: "",
@@ -158,7 +165,8 @@ const Landing2 = () => {
     e.preventDefault();
     try {
       if (userin.useremail === "" || userin.userpassword === "") {
-        alert("enter your registered email or password!");
+        toast.error("Enter your registered email or password!");
+
         return;
       }
       const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/login/${userin.useremail}/${userin.userpassword}`);
@@ -166,21 +174,22 @@ const Landing2 = () => {
 
       console.log("Response Message:", message);  // Log the response
 
+      
       if (message.startsWith("Welcome")) {
         localStorage.setItem('allinall', 'true');
         localStorage.setItem('useremail', userin.useremail);
-        alert(message);
+        toast.success(message); // Success message for welcome
         navigate("/home");  // Ensure navigate is being called here
         setUserin({
           useremail: "",
           userpassword: ""
         });
       } else if (message === "Invalid password") {
-        alert("The password entered is incorrect. Please try again.");
+        toast.error("The password entered is incorrect. Please try again.");
       } else if (message === "email not found?..") {
-        alert("The email entered is not registered. Please sign up.");
+        toast.error("The email entered is not registered. Please sign up.");
       } else {
-        alert("An unexpected error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -191,12 +200,12 @@ const Landing2 = () => {
     e.preventDefault();
     try {
       if (userin.useremail) {
-        alert("mail sent");
+        toast.success("Mail sent to your registered email");
         const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/forgotpass/${userin.useremail}`);
         console.log(response.data);
 
       } else {
-        alert("enter your registered email");
+        toast.promise("Please enter your registered email");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -265,6 +274,7 @@ const Landing2 = () => {
                     <span onClick={signup}><span className="text-slate-400 pr-1">New User</span> SignUp</span>
                   </p>
                 </div>
+                <ToastContainer />
 
                 <div
                   onClick={onSignin}
@@ -290,6 +300,7 @@ const Landing2 = () => {
                   helperText="all letters without special symbols"
                 />
               </div>
+              <ToastContainer />
 
               <div className="mt-2">
                 <TextInput

@@ -6,7 +6,9 @@ import "../App.css";
 import { useNavigate } from 'react-router-dom';
 
 const Landing2 = () => {
+  const [videoSource, setVideoSource] = useState("/vid.mp4");
   const navigate = useNavigate();
+
   const [user, setUser] = useState({
     username: "",
     usernumber: "",
@@ -212,160 +214,166 @@ const Landing2 = () => {
     <>
       <div className="h-svh flex justify-center items-center relative">
         {/* Background Layer with iframe */}
-        <iframe
-          title="Spline Background"
-          src="https://my.spline.design/themuseum-ae6a9e77b201737fc959a625d288ad62/"
-          className="absolute inset-0 w-full h-full border-none"
-        ></iframe>
+        <video
+          title="Video Background"
+          className="absolute inset-0 w-full h-[100vh] object-cover border-none"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src={videoSource} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
 
         {/* Foreground Container with Overlay */}
-        <div
-          className="w-[530px] h-[690px] rounded-md mx-5   bg-no-repeat bg-cover relative z-10"
-        >
+        <div className="w-[530px] h-[690px] rounded-md mx-5 bg-no-repeat bg-cover relative z-10">
           {/* Overlay Layer */}
           <div className="absolute inset-0 bg-black opacity-90 blur-3xl rounded-md"></div>
 
           {/* Text Content */}
-          <div
-            className="relative z-20 text-white brand text-7xl text-center mt-28 lg:text-3xl font-semibold"
-            style={{ fontFamily: "Pacifico, sans-serif" }} // Replace 'Poppins' with your font
-          >
+          <div className="relative z-20 text-white brand text-7xl text-center mt-28 lg:text-3xl font-semibold" style={{ fontFamily: "Pacifico, sans-serif" }}>
             Trendix
           </div>
 
+          {change.signIn && (
+            <>
+              <div className="relative z-20 text-slate-300 text-2xl text-center my-12">User Login</div>
+              <div className="relative z-20 signin m-4">
+                <div>
+                  <TextInput
+                    className="w-full"
+                    name="useremail"
+                    type="email"
+                    label="Email"
+                    value={userin.useremail}
+                    onChange={handleChange1}
+                    helperText={"enter email"}
+                  />
+                </div>
 
-          {change.signIn && <><div className="relative z-20 text-slate-300 text-2xl text-center my-12">User Login</div>
-            <div className="relative z-20 signin m-4">
-              <div className="">
+                <div className="mt-2">
+                  <Password
+                    name="userpassword"
+                    value={userin.userpassword}
+                    className="w-full"
+                    helperText={"8 characters with @ or # and numbers"}
+                    onChange={handleChange1}
+                  />
+                  <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
+                    <span onClick={password}>forget<span className="text-slate-400 pr-1"> Password?</span></span>
+                    <span onClick={signup}><span className="text-slate-400 pr-1">New User</span> SignUp</span>
+                  </p>
+                </div>
+
+                <div
+                  onClick={onSignin}
+                  className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
+                >
+                  Sign In
+                </div>
+              </div>
+            </>
+          )}
+
+          {change.register && (
+            <div className="signup m-3 relative z-20">
+              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">User Register</div>
+              <div>
                 <TextInput
-                  className="w-full"
-                  name="useremail"
-                  type="email"
-                  label="Email"
-                  value={userin.useremail}
-                  onChange={handleChange1}
-                  helperText={"enter email"}
+                  className="form-control"
+                  name="username"
+                  type="text"
+                  label="Name"
+                  value={user.username}
+                  onChange={handleChange}
+                  helperText="all letters without special symbols"
                 />
               </div>
 
               <div className="mt-2">
-                <Password
-                  name="userpassword"
-                  value={userin.userpassword}
-                  className="w-full"
-                  helperText={"8characters with @ or # and numbers"}
-                  onChange={handleChange1}
+                <TextInput
+                  className="form-control"
+                  name="usernumber"
+                  type="number"
+                  label="Number"
+                  value={user.usernumber}
+                  onChange={handleChange}
+                  helperText="10 digits"
                 />
-                <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
-                  <span onClick={password}>forget<span className="text-slate-400 pr-1"> Password?</span></span>
-                  <span onClick={signup}><span className="text-slate-400 pr-1">New User</span> SignUp</span>
-                </p>
               </div>
+
+              <div className="mt-2">
+                <TextInput
+                  className="form-control"
+                  name="useremail"
+                  type="email"
+                  label="Email"
+                  value={user.useremail}
+                  onChange={handleChange}
+                  helperText="valid email"
+                />
+              </div>
+
+              <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
+                <span></span>
+                <span onClick={signin}><span className="text-slate-400 pr-1">already have an account</span> SignIn</span>
+              </p>
 
               <div
-                onClick={onSignin}
+                onClick={sendotp}
                 className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
               >
-                Sign In
+                Send OTP
+              </div>
+            </div>
+          )}
+
+          {change.otpverify && (
+            <div className="relative z-20 otpverify m-3">
+              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">Verify OTP</div>
+              <div className="mt-2">
+                <TextInput
+                  className="form-control"
+                  name="userotp"
+                  type="number"
+                  label="OTP"
+                  value={user.userotp}
+                  onChange={handleChange}
+                  helperText="check your email for OTP"
+                />
               </div>
 
-            </div></>}
-
-          <div className="signup m-3 relative z-20">
-            {change.register &&
-              <div>
-                <div className="text-slate-300 text-2xl text-center mt-12 mb-8">User Register</div>
-                <div>
-                  <TextInput
-                    className="form-control"
-                    name="username"
-                    type="text"
-                    label="Name"
-                    value={user.username}
-                    onChange={handleChange}
-                    helperText="all letters without special symbols"
-                  />
-                </div>
-
-                <div className="mt-2">
-                  <TextInput
-                    className="form-control"
-                    name="usernumber"
-                    type="number"
-                    label="Number"
-                    value={user.usernumber}
-                    onChange={handleChange}
-                    helperText="10 digits"
-                  />
-                </div>
-
-                <div className="mt-2">
-                  <TextInput
-                    className="form-control"
-                    name="useremail"
-                    type="email"
-                    label="Email"
-                    value={user.useremail}
-                    onChange={handleChange}
-                    helperText="valid email"
-                  />
-                </div>
-                <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
-                  <span></span>
-                 
-                  <span onClick={signin}><span className="text-slate-400 pr-1">already have an account</span> SignIn</span>
-                </p>
-
-
-
-                <div
-                  onClick={sendotp}
-                  className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-                >
-                  Send OTP
-                </div>
-                
-              </div>
-            }
-          </div>
-
-          {change.otpverify &&
-            <div className="relative z-20 text-center mt-12">
-              <TextInput
-                className="form-control"
-                name="userotp"
-                type="number"
-                label="OTP"
-                value={user.userotp}
-                onChange={handleChange}
-                helperText="Enter OTP"
-              />
               <div
                 onClick={verifyotp}
                 className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
               >
                 Verify OTP
               </div>
-              
             </div>
-          }
+          )}
 
-          {change.setpassword && <div className="relative z-20 text-center mt-12">
-            <Password
-              name="userpassword"
-              value={user.userpassword}
-              className="w-full"
-              helperText="Enter password"
-              onChange={handleChange}
-            />
-            
-            <div
-              onClick={onSignup}
-              className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-            >
-              Set Password
+          {change.setpassword && (
+            <div className="relative z-20 setpassword m-3">
+              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">Set Password</div>
+              <div className="mt-2">
+                <Password
+                  name="userpassword"
+                  value={user.userpassword}
+                  className="w-full"
+                  helperText="8 characters with @ or # and numbers"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div
+                onClick={onSignup}
+                className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
+              >
+                Set Password
+              </div>
             </div>
-          </div>}
+          )}
         </div>
       </div>
     </>

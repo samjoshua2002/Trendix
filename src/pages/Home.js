@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react'; // Added useContext import
 import { GridGallery } from './GridGallery';
-import product from "../assects/product.json"
+
 import "../App.css";
 import Footer from '../Sections/Footer';
 import Features from '../Sections/Features';
 import SmallCard from './SmallCard';
+import { AppContext } from '../App';
 
 function Home() {
+  const { allproducts } = useContext(AppContext); // Use context to get allproducts
+
   return (
     <div className="p-5 md:p-10 bg-gradient-to-b">
       {/* Hero Section */}
@@ -32,16 +35,54 @@ function Home() {
         </div>
       </section>
 
-      <section className=' my-10'>
-          <div className="brand text-4xl md:text-5xl text-center">Exclusive Offers on Top Brands</div>
-          <div className="texts text-center text-lg">Shop Now and Save Big!</div>
-          <div className="">
-            <SmallCard products={product} classname={"overflow-x-auto flex scrollbar-hide "} />
-          </div>
-        </section>
+      {/* Exclusive Offers Section */}
+      <section className="offer images my-10">
+        <div className="brand text-4xl md:text-5xl text-center text-3xl">Exclusive Offers on Top Brands</div>
+        <div className="texts text-center text-lg">Shop Now and Save Big!</div>
+        <div className="flex justify-center">
+          {/* Display fallback message if no products available */}
+          {allproducts.length > 0 ? (
+            <SmallCard products={allproducts} classname={"overflow-x-auto flex scrollbar-hide"} />
+          ) : (
+            <p>No products available</p>
+          )}
+        </div>
+      </section>
+
+      {/* Latest Collection Section */}
+      <section className="latest collection my-10">
+        <div>
+          <div className="brand text-4xl md:text-5xl text-center">The Latest Collection</div>
+          <div className="texts text-center text-lg">Be the first to explore our newest arrivals!</div>
+        </div>
+        <div>
+          {/* Display fallback message if no products available */}
+          {allproducts.length > 0 ? (
+            <SmallCard products={allproducts} classname={"overflow-y-auto flex flex-wrap scrollbar-hide justify-center h-[400px] md:h-[550px]"} />
+          ) : (
+            <p>No products available</p>
+          )}
+        </div>
+      </section>
+
+      {/* Best Sellers Section */}
+      <section className="best sellers my-10">
+        <div>
+          <div className="brand text-4xl md:text-5xl text-center">Our Best Sellers</div>
+          <div className="texts text-center text-lg">Discover the dresses that our customers can't get enough of!</div>
+        </div>
+        <div>
+          {/* Display fallback message if no products available */}
+          {allproducts.length > 0 ? (
+            <SmallCard products={allproducts} classname={"overflow-x-auto flex scrollbar-hide"} />
+          ) : (
+            <p>No products available</p>
+          )}
+        </div>
+      </section>
 
       {/* Feature Section */}
-     <Features/>
+      <Features />
 
       {/* Footer */}
       <Footer />

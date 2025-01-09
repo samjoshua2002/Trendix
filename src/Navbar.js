@@ -30,7 +30,7 @@ export default function Navbar() {
   return (
     <div className="relative" style={{ WebkitTapHighlightColor: "transparent" }}>
       <motion.nav
-        className="bg-white border top-0 left-0 w-full cursor-pointer z-50"
+        className="bg-white  top-0 left-0 w-full cursor-pointer z-50"
         initial={{ y: -100 }} 
         animate={{ y: showNavbar ? 0 : -100 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}

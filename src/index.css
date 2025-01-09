@@ -6,3 +6,6 @@
 .fancy-font {
   font-family: 'Pacifico', cursive;
 }
+html {
+  scroll-behavior: smooth;
+}

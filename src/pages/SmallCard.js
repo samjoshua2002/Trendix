@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import LikeIcon from '@mui/icons-material/Favorite'; 
 import "../App.css";
 
@@ -23,20 +23,22 @@ const SmallCard = ({ products, classname }) => {
             key={item.id}
             className="flex-shrink-0 w-60 bg-white shadow-lg p-2 border border-slate-300 rounded-md"
           >
-            <div className="bg-gray-100 rounded-md text-center p-2 relative">
-              <LikeIcon
-                className={`absolute right-2 ${item.liked ? 'text-red-500' : 'text-slate-300'}`}
-                onClick={() => toggleLike(item.id)}
-                style={{ fontSize: '30px', cursor: 'pointer' }}
-              />
+            <div className="bg-white rounded-md text-center p-2 relative">
               <img
-                className="hover:scale-110 transition-all duration-300 h-56 w-full rounded"
+                className="hover:scale-110 transition-all duration-300 h-64 w-full rounded"
                 src={item.imageUrl}
                 alt={item.title}
               />
             </div>
             <div className="body capitalize bg-neutral-50 mt-1 px-1 rounded-md">
-              <p className="text-lg">{item.title}</p>
+              <div className="flex justify-between items-center">
+                <p className="text-lg">{item.title}</p>
+                <LikeIcon
+                  className={`cursor-pointer ${item.liked ? 'text-red-500' : 'text-slate-300'}`}
+                  onClick={() => toggleLike(item.id)}
+                  style={{ fontSize: '30px' }} // Increased size
+                />
+              </div>
               <div className="flex justify-between">
                 <p className="font-semibold">{item.brand}</p>
                 <p className="font-medium">

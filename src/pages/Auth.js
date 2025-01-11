@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const Landing2 = () => {
   const [videoSource] = useState("/vid.mp4");
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ const Landing2 = () => {
     useremail: "", userpassword: ""
   });
 
-  const [,setError] = useState({
+  const [, setError] = useState({
     username: "",
     userpassword: ""
   });
@@ -68,19 +67,19 @@ const Landing2 = () => {
         toast.success(`OTP sent to your mail-id: ${user.useremail}`);
         setChange((prevstate) => ({ ...prevstate, otpverify: !change.otpverify, register: !change.register }));
       } else if (response.data === "Account already exists") {
-         toast.error("Account already exists.");
+        toast.error("Account already exists.");
       } else {
         toast.error(response.data.message || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to send OTP. Please try again later.");
     }
   };
 
   const verifyotp = async (e) => {
     if (user.userotp === "") {
       toast.info("Please enter the OTP.");
-
       return;
     }
     e.preventDefault();
@@ -93,7 +92,6 @@ const Landing2 = () => {
       console.log(response);
       if (response.data === "User verified") {
         toast.info(`User ${user.username} verified`);
-
         setChange((prevstate) => ({
           ...prevstate,
           setpassword: true,
@@ -101,10 +99,10 @@ const Landing2 = () => {
         }));
       } else {
         toast.error(response.data.message || "Invalid OTP. Please try again.");
-
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to verify OTP. Please try again.");
     }
   };
 
@@ -147,7 +145,6 @@ const Landing2 = () => {
         }));
       } else {
         toast.error(response.data.message || "Signup failed. Please try again.");
-
       }
       setUser({
         username: "",
@@ -158,6 +155,7 @@ const Landing2 = () => {
       });
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to set password. Please try again.");
     }
   };
 
@@ -166,20 +164,18 @@ const Landing2 = () => {
     try {
       if (userin.useremail === "" || userin.userpassword === "") {
         toast.error("Enter your registered email or password!");
-
         return;
       }
       const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/login/${userin.useremail}/${userin.userpassword}`);
       const message = response.data;
 
-      console.log("Response Message:", message);  // Log the response
+      console.log("Response Message:", message);
 
-      
       if (message.startsWith("Welcome")) {
         localStorage.setItem('allinall', 'true');
         localStorage.setItem('useremail', userin.useremail);
-        toast.success(message); // Success message for welcome
-        navigate("/home");  // Ensure navigate is being called here
+        toast.success(message);
+        navigate("/home");
         setUserin({
           useremail: "",
           userpassword: ""
@@ -193,6 +189,7 @@ const Landing2 = () => {
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to sign in. Please check your connection.");
     }
   };
 
@@ -203,24 +200,24 @@ const Landing2 = () => {
         toast.success("Mail sent to your registered email");
         const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/forgotpass/${userin.useremail}`);
         console.log(response.data);
-
       } else {
-        toast.promise("Please enter your registered email");
+        toast.error("Please enter your registered email");
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to send password reset email. Please try again.");
     }
   };
 
-  // Add useEffect to check user login status
   useEffect(() => {
     if (localStorage.getItem('allinall') === 'true') {
-      navigate("/home"); // Automatically redirect if user is logged in
+      navigate("/home");
     }
   }, [navigate]);
 
   return (
     <>
+    <ToastContainer />
       <div className="h-svh flex justify-center items-center relative">
         {/* Background Layer with iframe */}
         <video

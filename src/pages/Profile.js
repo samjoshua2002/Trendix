@@ -6,8 +6,9 @@ function Profile() {
 
   const handleSignOut = () => {
     // Clear any authentication-related data (e.g., localStorage)
-    localStorage.removeItem('allinall');
-    localStorage.removeItem('useremail');
+    
+    
+    localStorage.setItem('allinall', 'false');
     
     // Navigate to the landing page
     navigate('/landing');

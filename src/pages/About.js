@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaShoppingCart, FaTag, FaShippingFast, FaRegHeart } from 'react-icons/fa';
 import Footer from '../Sections/Footer';
+import Contact from '../Sections/Contact';
 
 const About = () => {
   return (
@@ -42,7 +43,6 @@ const About = () => {
                 <a href="#s" className="text-sm font-semibold leading-6 text-gray-700">Learn More <span aria-hidden="true">→</span></a>
               </div>
             </div>
-            {/* <img src="https://cdn.dribbble.com/userupload/9096962/file/original-cef874b9f453700d49b967bbe3e5551a.jpg?resize=1024x768&vertical=center" alt="Product screenshot" className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0" width="2432" height="1442" /> */}
             <img src="https://cdn.dribbble.com/userupload/16601757/file/original-dc4998569717e59c14db21d05cd99d37.png?resize=1024x768&vertical=center" alt="Product screenshot" className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0" width="2432" height="1442" />
           </div>
         </div>
@@ -67,7 +67,7 @@ const About = () => {
               <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
                 <div className="relative">
                   <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 ">
+                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500">
                       <FaShoppingCart />
                     </div>
                     <p className="font-heading ml-16 text-lg leading-6 font-bold text-gray-700">Easy Shopping</p>
@@ -89,7 +89,7 @@ const About = () => {
                 </div>
                 <div className="relative">
                   <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 ">
+                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500">
                       <FaShippingFast />
                     </div>
                     <p className="font-heading ml-16 text-lg leading-6 font-bold text-gray-700">Fast Shipping</p>
@@ -100,7 +100,7 @@ const About = () => {
                 </div>
                 <div className="relative">
                   <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 ">
+                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary-500">
                       <FaRegHeart />
                     </div>
                     <p className="font-heading ml-16 text-lg leading-6 font-bold text-gray-700">Customer Satisfaction</p>
@@ -114,7 +114,9 @@ const About = () => {
           </div>
         </div>
       </section>
-      <Footer/>
+
+      <Contact/>
+      <Footer />
     </div>
   );
 };

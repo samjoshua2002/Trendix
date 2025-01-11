@@ -19,7 +19,7 @@ function App() {
 
   // Check if user is registered based on localStorage
   useEffect(() => {
-    const userStatus = localStorage.getItem("allinall");
+    const userStatus = localStorage.getItem("trendix");
     if (userStatus === "true") {
       setIsRegistered(true);
     }

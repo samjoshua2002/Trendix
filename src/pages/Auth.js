@@ -172,7 +172,7 @@ const Landing2 = () => {
       console.log("Response Message:", message);
 
       if (message.startsWith("Welcome")) {
-        localStorage.setItem('allinall', 'true');
+        localStorage.setItem('trendix', 'true');
         localStorage.setItem('useremail', userin.useremail);
         toast.success(message);
         navigate("/home");
@@ -210,7 +210,7 @@ const Landing2 = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('allinall') === 'true') {
+    if (localStorage.getItem('trendix') === 'true') {
       navigate("/home");
     }
   }, [navigate]);

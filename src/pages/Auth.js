@@ -135,7 +135,7 @@ const Landing2 = () => {
       console.log(response);
       if (response.data === "Password has been set successfully.") {
         toast.success("Signup successful. Please login to continue.");
-        localStorage.setItem('allinall', 'true');
+        localStorage.setItem('trendix', 'true');
         localStorage.setItem('useremail', user.useremail);
         setChange((prevstate) => ({
           ...prevstate, signIn: true,

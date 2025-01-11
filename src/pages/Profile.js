@@ -8,7 +8,7 @@ function Profile() {
     // Clear any authentication-related data (e.g., localStorage)
     
     
-    localStorage.setItem('allinall', 'false');
+    localStorage.setItem('trendix', 'false');
     
     // Navigate to the landing page
     navigate('/landing');

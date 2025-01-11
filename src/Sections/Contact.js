@@ -22,7 +22,7 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8081/contact', formData);
+      const response = await axios.post('https://shoppingserver-q9kv.onrender.com/contact', formData);
       if (response.status === 200) {
         setStatus('Message sent successfully!');
         setFormData({ name: '', email: '', message: '' }); // Reset form

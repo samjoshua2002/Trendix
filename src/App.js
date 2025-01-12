@@ -9,6 +9,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Navbar from "./Navbar";
 import Landing2 from "./pages/Auth";
+import Form from "./pages/Form";
 
 
 
@@ -132,6 +133,7 @@ function MainContent({ isRegistered }) {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Form />} />
       </Routes>
     </div>
   );

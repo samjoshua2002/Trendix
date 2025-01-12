@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FaBug, FaEnvelope, FaPhone, FaNewspaper } from 'react-icons/fa';
-
+import {BASE_URL} from "../App"
 function Contact() {
   const [formData, setFormData] = useState({
     name: '',
@@ -22,7 +22,8 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://shoppingserver-q9kv.onrender.com/contact', formData);
+      const response = await axios.post(`${BASE_URL}/contact`, formData);
+
       if (response.status === 200) {
         setStatus('Message sent successfully!');
         setFormData({ name: '', email: '', message: '' }); // Reset form

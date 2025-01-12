@@ -3,6 +3,7 @@ import { FaShoppingCart, FaTag, FaShippingFast, FaRegHeart } from 'react-icons/f
 import Footer from '../Sections/Footer';
 import Contact from '../Sections/Contact';
 
+
 const About = () => {
   return (
     <div>

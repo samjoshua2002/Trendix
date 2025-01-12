@@ -10,8 +10,11 @@ import Profile from "./pages/Profile";
 import Navbar from "./Navbar";
 import Landing2 from "./pages/Auth";
 
+
+
 // Create a context
 export const AppContext = createContext();
+export  const BASE_URL = 'http://localhost:8081';
 
 function App() {
   const [isRegistered, setIsRegistered] = useState(false);
@@ -29,7 +32,8 @@ function App() {
   useEffect(() => {
     const fetchProductsWithLikes = async () => {
       try {
-        const response = await axios.get("https://shoppingserver-q9kv.onrender.com/product/getall");
+        const response = await axios.get(`${BASE_URL}/product/getall`);
+
         console.log(response.data); // Log the response to check the data
         const products = response.data;
 
@@ -41,7 +45,7 @@ function App() {
           // Fetch isLiked for each product
           const enrichedProducts = await Promise.all(
             products.map(async (product) => {
-              const isLikedResponse = await axios.get(`https://shoppingserver-q9kv.onrender.com/wishlist/isLiked/${userId}/${product.id}`);
+              const isLikedResponse = await axios.get(`${BASE_URL}/wishlist/isLiked/${userId}/${product.id}`);
               return {
                 ...product,
                 isLiked: isLikedResponse.data, // Add isLiked dynamically
@@ -67,7 +71,7 @@ function App() {
       const email = localStorage.getItem('useremail');
       if (!email) return; // Exit if user is not logged in
 
-      const userResponse = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/getuserid/${email}`);
+      const userResponse = await axios.get(`${BASE_URL}/user/getuserid/${email}`);
       const userId = userResponse.data;
 
       const productIndex = allproducts.findIndex((p) => p.id === productId);
@@ -83,12 +87,12 @@ function App() {
       // Now perform the backend operation
       if (isLiked) {
         // Unlike the product
-        await axios.post(`https://shoppingserver-q9kv.onrender.com/wishlist/unlike/${userId}/${productId}`);
-        await axios.delete(`https://shoppingserver-q9kv.onrender.com/wishlist/delwishlist/${userId}/${productId}`);
+        await axios.post(`${BASE_URL}/wishlist/unlike/${userId}/${productId}`);
+        await axios.delete(`${BASE_URL}/wishlist/delwishlist/${userId}/${productId}`);
       } else {
         // Like the product
-        await axios.post(`https://shoppingserver-q9kv.onrender.com/wishlist/like/${userId}/${productId}`);
-        await axios.post(`https://shoppingserver-q9kv.onrender.com/wishlist/addwishlist/${userId}/${productId}`);
+        await axios.post(`${BASE_URL}/wishlist/like/${userId}/${productId}`);
+        await axios.post(`${BASE_URL}/wishlist/addwishlist/${userId}/${productId}`);
       }
     } catch (error) {
       console.error("Error toggling like status:", error);

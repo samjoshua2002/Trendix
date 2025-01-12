@@ -6,6 +6,7 @@ import "../App.css";
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {BASE_URL} from "../App"
 
 const Landing2 = () => {
   const [videoSource] = useState("/vid.mp4");
@@ -27,6 +28,7 @@ const Landing2 = () => {
     username: "",
     userpassword: ""
   });
+
 
   const [change, setChange] = useState({
     signIn: true,
@@ -52,7 +54,7 @@ const Landing2 = () => {
     setChange({ ...change, signIn: false, register: true });
     clearForm1();
   };
-
+ 
   const sendotp = async (e) => {
     e.preventDefault();
     try {
@@ -61,7 +63,7 @@ const Landing2 = () => {
         useremail: user.useremail,
         usernumber: user.usernumber ? parseInt(user.usernumber, 10) : null,
       };
-      const response = await axios.post("https://shoppingserver-q9kv.onrender.com/user/register", userData);
+      const response = await axios.post(`${BASE_URL}/user/register`, userData);
       console.log(response);
       if (response.data === "Registered successfully") {
         toast.success(`OTP sent to your mail-id: ${user.useremail}`);
@@ -88,7 +90,7 @@ const Landing2 = () => {
         userotp: user.userotp,
         useremail: user.useremail
       };
-      const response = await axios.post(`https://shoppingserver-q9kv.onrender.com/user/verify-otp/${userData.useremail}/${userData.userotp}`);
+      const response = await axios.post(`${BASE_URL}/user/verify-otp/${userData.useremail}/${userData.userotp}`);
       console.log(response);
       if (response.data === "User verified") {
         toast.info(`User ${user.username} verified`);
@@ -131,7 +133,7 @@ const Landing2 = () => {
         userpassword: user.userpassword,
         useremail: user.useremail
       };
-      const response = await axios.post(`https://shoppingserver-q9kv.onrender.com/user/setpassword/${userData.useremail}/${userData.userpassword}`);
+      const response = await axios.post(`${BASE_URL}/user/setpassword/${userData.useremail}/${userData.userpassword}`);
       console.log(response);
       if (response.data === "Password has been set successfully.") {
         toast.success("Signup successful. Please login to continue.");
@@ -166,7 +168,7 @@ const Landing2 = () => {
         toast.error("Enter your registered email or password!");
         return;
       }
-      const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/login/${userin.useremail}/${userin.userpassword}`);
+      const response = await axios.get(`${BASE_URL}/user/login/${userin.useremail}/${userin.userpassword}`);
       const message = response.data;
 
       console.log("Response Message:", message);
@@ -198,7 +200,7 @@ const Landing2 = () => {
     try {
       if (userin.useremail) {
         toast.success("Mail sent to your registered email");
-        const response = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/forgotpass/${userin.useremail}`);
+        const response = await axios.get(`${BASE_URL}/user/forgotpass/${userin.useremail}`);
         console.log(response.data);
       } else {
         toast.error("Please enter your registered email");

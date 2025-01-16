@@ -1,6 +1,6 @@
-import React, { useState, useEffect, createContext } from "react"; // Import necessary hooks and createContext
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom"; // Import Router components
-import axios from 'axios'; // Make sure axios is imported
+import React, { useState, useEffect, createContext } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import axios from "axios";
 import Home from "./pages/Home";
 import Collections from "./pages/Collections";
 import About from "./pages/About";
@@ -10,16 +10,15 @@ import Profile from "./pages/Profile";
 import Navbar from "./Navbar";
 import Landing2 from "./pages/Auth";
 import Form from "./pages/Form";
-
-
+import Displaycard from "./pages/Displaycard";
 
 // Create a context
 export const AppContext = createContext();
-export  const BASE_URL = 'http://localhost:8081';
+export const BASE_URL = "http://192.168.0.234:8081";
 
 function App() {
   const [isRegistered, setIsRegistered] = useState(false);
-  const [allproducts, setAllproducts] = useState([]); // Declare state for all products
+  const [allproducts, setAllproducts] = useState([]);
 
   // Check if user is registered based on localStorage
   useEffect(() => {
@@ -34,29 +33,26 @@ function App() {
     const fetchProductsWithLikes = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/product/getall`);
-
-        console.log(response.data); // Log the response to check the data
         const products = response.data;
 
-        const email = localStorage.getItem('useremail');
+        const email = localStorage.getItem("useremail");
         if (email) {
-          const userResponse = await axios.get(`https://shoppingserver-q9kv.onrender.com/user/getuserid/${email}`);
+          const userResponse = await axios.get(`${BASE_URL}/user/getuserid/${email}`);
           const userId = userResponse.data;
 
-          // Fetch isLiked for each product
           const enrichedProducts = await Promise.all(
             products.map(async (product) => {
               const isLikedResponse = await axios.get(`${BASE_URL}/wishlist/isLiked/${userId}/${product.id}`);
               return {
                 ...product,
-                isLiked: isLikedResponse.data, // Add isLiked dynamically
+                isLiked: isLikedResponse.data,
               };
             })
           );
 
           setAllproducts(enrichedProducts);
         } else {
-          setAllproducts(products); // Fallback if user not logged in
+          setAllproducts(products);
         }
       } catch (error) {
         console.error("Failed to fetch products with likes:", error);
@@ -69,8 +65,8 @@ function App() {
   // Function to handle like/unlike toggle
   const handleLikeToggle = async (productId) => {
     try {
-      const email = localStorage.getItem('useremail');
-      if (!email) return; // Exit if user is not logged in
+      const email = localStorage.getItem("useremail");
+      if (!email) return;
 
       const userResponse = await axios.get(`${BASE_URL}/user/getuserid/${email}`);
       const userId = userResponse.data;
@@ -80,33 +76,28 @@ function App() {
 
       const isLiked = allproducts[productIndex].isLiked;
 
-      // Optimistically update the UI to reflect the like/unlike action immediately
+      // Optimistically update the UI
       const updatedProducts = [...allproducts];
       updatedProducts[productIndex].isLiked = !isLiked;
       setAllproducts(updatedProducts);
 
-      // Now perform the backend operation
+      // Perform the backend operation
       if (isLiked) {
-        // Unlike the product
         await axios.post(`${BASE_URL}/wishlist/unlike/${userId}/${productId}`);
         await axios.delete(`${BASE_URL}/wishlist/delwishlist/${userId}/${productId}`);
       } else {
-        // Like the product
         await axios.post(`${BASE_URL}/wishlist/like/${userId}/${productId}`);
         await axios.post(`${BASE_URL}/wishlist/addwishlist/${userId}/${productId}`);
       }
     } catch (error) {
       console.error("Error toggling like status:", error);
-      // If error occurs, optionally alert the user or handle the error more gracefully.
-      // We should **not revert the UI state** because it would cause flickering.
     }
   };
 
-  // Provide context and wrap with Router and MainContent
   return (
     <AppContext.Provider value={{ isRegistered, setIsRegistered, allproducts, handleLikeToggle }}>
       <Router>
-        <MainContent isRegistered={isRegistered} setIsRegistered={setIsRegistered} />
+        <MainContent isRegistered={isRegistered} />
       </Router>
     </AppContext.Provider>
   );
@@ -118,14 +109,11 @@ function MainContent({ isRegistered }) {
 
   return (
     <div>
-      {/* Show Navbar only on certain routes */}
-      {(location.pathname === "/home" || location.pathname === "/cart" || location.pathname === "/profile" || location.pathname === "/collections" || location.pathname === "/about" || location.pathname === "/wishlist") && <Navbar />}
+      {/* Show Navbar only on specific routes */}
+      {["/home", "/cart", "/profile", "/collections", "/about", "/wishlist","/displaycard/:id"].includes(location.pathname) && <Navbar />}
 
       <Routes>
-        {/* Redirect to home if user is registered */}
         <Route path="/" element={isRegistered ? <Navigate to="/home" /> : <Landing2 />} />
-        
-        {/* Define Routes for other pages */}
         <Route path="/home" element={<Home />} />
         <Route path="/landing" element={<Landing2 />} />
         <Route path="/collections" element={<Collections />} />
@@ -134,6 +122,7 @@ function MainContent({ isRegistered }) {
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Form />} />
+        <Route path="/displaycard/:id" element={<Displaycard/>} />
       </Routes>
     </div>
   );

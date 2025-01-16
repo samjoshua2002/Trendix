@@ -1,78 +1,76 @@
 import React, { useState, useMemo, useContext } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import { IoIosArrowDropdown } from 'react-icons/io';
-import Csmallcard from './Csmallcard';
-
+import { useNavigate } from 'react-router-dom';
+import { SlidersHorizontal} from 'lucide-react';
 import { AppContext } from '../App';
+import SmallCard from './SmallCard';
 
 function Collection() {
   const { allproducts } = useContext(AppContext);
-  const [products] = useState(allproducts); 
+  const [products] = useState(allproducts);
   const [selectedFilters, setSelectedFilters] = useState({
     category: [],
     type: [],
   });
-  const [sortOption, setSortOption] = useState('relevant'); 
-  const [showFilter, setShowFilter] = useState(false); 
+  const [sortOption, setSortOption] = useState('relevant');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-
-  // Handle filter changes
   const handleFilterChange = (filterType, value) => {
     setSelectedFilters((prevState) => {
       const isChecked = prevState[filterType].includes(value);
       return {
         ...prevState,
         [filterType]: isChecked
-          ? prevState[filterType].filter((item) => item !== value) 
-          : [...prevState[filterType], value], 
+          ? prevState[filterType].filter((item) => item !== value)
+          : [...prevState[filterType], value],
       };
+    });
+  };
+
+  const clearFilters = () => {
+    setSelectedFilters({
+      category: [],
+      type: [],
     });
   };
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products;
-  
-    // Apply category filter
+
     if (selectedFilters.category.length > 0) {
       filtered = filtered.filter((product) =>
         selectedFilters.category.some((selected) => selected === product.category)
       );
     }
-  
-    // Apply type filter
+
     if (selectedFilters.type.length > 0) {
       filtered = filtered.filter((product) =>
         selectedFilters.type.some((selected) => selected === product.type)
       );
     }
-  
-// Apply sorting
-if (sortOption === 'low-high') {
-  filtered = [...filtered].sort((a, b) => {
-    const priceA = a.discountedPrice > 0 ? a.discountedPrice : a.originalPrice;
-    const priceB = b.discountedPrice > 0 ? b.discountedPrice : b.originalPrice;
-    return priceA - priceB;
-  });
-} else if (sortOption === 'high-low') {
-  filtered = [...filtered].sort((a, b) => {
-    const priceA = a.discountedPrice > 0 ? a.discountedPrice : a.originalPrice;
-    const priceB = b.discountedPrice > 0 ? b.discountedPrice : b.originalPrice;
-    return priceB - priceA;
-  });
-}
 
-  
+    if (sortOption === 'low-high') {
+      filtered = [...filtered].sort((a, b) => {
+        const priceA = a.discountedPrice > 0 ? a.discountedPrice : a.originalPrice;
+        const priceB = b.discountedPrice > 0 ? b.discountedPrice : b.originalPrice;
+        return priceA - priceB;
+      });
+    } else if (sortOption === 'high-low') {
+      filtered = [...filtered].sort((a, b) => {
+        const priceA = a.discountedPrice > 0 ? a.discountedPrice : a.originalPrice;
+        const priceB = b.discountedPrice > 0 ? b.discountedPrice : b.originalPrice;
+        return priceB - priceA;
+      });
+    }
+
     return filtered;
   }, [products, selectedFilters, sortOption]);
 
-  // Sort option change handler
   const handleSortChange = (event) => {
     setSortOption(event.target.value);
   };
 
-  // Filter data configuration
   const filterData = [
     {
       title: 'Category',
@@ -87,75 +85,86 @@ if (sortOption === 'low-high') {
   ];
 
   const handleProductSelect = (product) => {
-    // Navigate to the product detail page
     navigate(`/displaycard/${product.id}`);
   };
 
-  return (
-    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10  mx-3">
-      {/* Filter Section */}
-      <div className="min-w-60">
-        <p
-          className="my-2 text-xl flex items-center cursor-pointer gap-2"
-          onClick={() => setShowFilter(!showFilter)}
-        >
-          Filters
-          <IoIosArrowDropdown
-            className={`h-5 mt-1 sm:hidden ${showFilter ? 'rotate-90' : ''}`}
-          />
-        </p>
+  const activeFiltersCount = Object.values(selectedFilters).flat().length;
 
-        {/* Filter Options */}
-        {filterData.map((filter, index) => (
-          <div
-            key={index}
-            className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? '' : 'hidden'} sm:block`}
-          >
-            <p className="mb-3 text-sm font-medium">{filter.title}</p>
-            <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-              {filter.options.map((option, idx) => (
-                <p className="flex gap-2" key={idx}>
-                  <input
-                    className="w-4"
-                    type="checkbox"
-                    value={option}
-                    onChange={() => handleFilterChange(filter.filterKey, option)}
-                    checked={selectedFilters[filter.filterKey].includes(option)}
-                  />
-                  {option}
-                </p>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Banner */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-full mx-auto px-4 sm:px-6 pt-24 sm:pt-20">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">All Collections</h1>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className="sm:hidden inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
+              </button>
+              <select
+                className="border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                value={sortOption}
+                onChange={handleSortChange}
+              >
+                <option value="relevant">Sort by: Relevant</option>
+                <option value="low-high">Price: Low to High</option>
+                <option value="high-low">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filter Bar */}
+          <div className="hidden lg:block w-64 flex-shrink-0 bg-white p-4 shadow-md rounded-md">
+            {filterData.map((filter, index) => (
+              <div key={index} className="mb-6">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">{filter.title}</h3>
+                <div className="space-y-3">
+                  {filter.options.map((option, idx) => (
+                    <label key={idx} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        value={option}
+                        onChange={() => handleFilterChange(filter.filterKey, option)}
+                        checked={selectedFilters[filter.filterKey].includes(option)}
+                      />
+                      <span className="ml-3 text-sm text-gray-600">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
+
+          {/* Product Grid */}
+          <div className="flex-1">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {filteredAndSortedProducts.map((product) => (
+                <SmallCard
+                  key={product.id}
+                  products={[product]}
+                  handleProductSelect={handleProductSelect}
+                />
               ))}
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Product Section */}
-      <div className="flex-1">
-        <div className="flex justify-between text-base sm:text-2xl mb-4">
-          <h2 className="texts text-lg">All Collections</h2>
-        </div>
-
-        {/* Sorting Dropdown */}
-        <select
-          className="border-2 border-gray-300 p-1 texts text-md"
-          value={sortOption}
-          onChange={handleSortChange}
-        >
-          <option value="relevant">Sort by: Relevant</option>
-          <option value="low-high">Sort by: Low to High</option>
-          <option value="high-low">Sort by: High to Low</option>
-        </select>
-
-        {/* Product List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {filteredAndSortedProducts.map((product) => (
-            <Csmallcard
-              key={product.id}
-              product={product}
-              // onClick={() => handleProductSelect(product)} 
-            />
-          ))}
         </div>
       </div>
     </div>

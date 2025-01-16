@@ -92,7 +92,7 @@ function Form() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-violet-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <Package className="mx-auto h-12 w-12 text-blue-600" />
@@ -106,7 +106,7 @@ function Form() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
-          <div className="bg-white rounded-xl shadow-xl p-6">
+          <div className=" bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-xl p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Title */}
@@ -274,7 +274,7 @@ function Form() {
           </div>
 
           {/* Live Preview Section */}
-          <div className="bg-white rounded-xl shadow-xl p-6">
+          <div className=" bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-xl p-6">
   <h2 className="text-xl font-semibold text-gray-900">Live Preview</h2>
   <div className="mt-4 grid grid-cols-1 gap-4">
     {formData.imageUrl ? (

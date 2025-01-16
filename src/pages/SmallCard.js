@@ -1,56 +1,125 @@
-import React, { useState } from 'react';
-import LikeIcon from '@mui/icons-material/Favorite'; 
+import React, { useContext, useState, useEffect } from 'react';
+import { Star, Heart, Tag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import "../App.css";
+import { AppContext } from '../App';
 
 const SmallCard = ({ products, classname }) => {
-  // If products is passed as an array, we set the state based on that.
   const [items, setItems] = useState(products || []);
+  const navigate = useNavigate();
+  const { handleLikeToggle } = useContext(AppContext);
 
-  const toggleLike = (id) => {
+  useEffect(() => {
+    setItems(products || []);
+  }, [products]);
+
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
+
+  const handleCardClick = (id) => {
+    navigate(`/displaycard/${id}`);
+  };
+
+  const handleLike = (e, id) => {
+    e.stopPropagation();
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, liked: !item.liked } : item
+        item.id === id ? { ...item, isLiked: !item.isLiked } : item
       )
     );
+    handleLikeToggle(id);
+  };
+
+  const calculateDiscount = (original, discounted) => {
+    return Math.round(((original - discounted) / original) * 100);
   };
 
   return (
-    <div className={`gap-6 p-4 ${classname}`}>
-      {/* Ensure products is an array */}
+    <div className={`gap-6 p-2 ${classname}`}>
       {Array.isArray(items) && items.length > 0 ? (
         items.map((item) => (
           <div
             key={item.id}
-            className="flex-shrink-0 w-60 bg-white shadow-lg p-2 border border-slate-300 rounded-md"
+            onClick={() => handleCardClick(item.id)}
+            className="group bg-white rounded-xl border border-1 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
           >
-            <div className="bg-white rounded-md text-center p-2 relative">
+            {/* Image Container */}
+            <div className="relative aspect-[3/4] overflow-hidden">
               <img
-                className="hover:scale-110 transition-all duration-300 h-64 w-full rounded"
+                 className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                 src={item.imageUrl}
                 alt={item.title}
               />
-            </div>
-            <div className="body capitalize bg-neutral-50 mt-1 px-1 rounded-md">
-              <div className="flex justify-between items-center">
-                <p className="text-lg">{item.title}</p>
-                <LikeIcon
-                  className={`cursor-pointer ${item.liked ? 'text-red-500' : 'text-slate-300'}`}
-                  onClick={() => toggleLike(item.id)}
-                  style={{ fontSize: '30px' }} // Increased size
+              <button
+                onClick={(e) => handleLike(e, item.id)}
+                className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-110"
+              >
+                <Heart
+                  className={`w-5 h-5 ${
+                    item.isLiked ? "fill-red-500 text-red-500" : "text-pink-400"
+                  }`}
                 />
+              </button>
+              {item.discountedPrice && (
+                <div className="absolute top-3 left-3 bg-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  {calculateDiscount(item.originalPrice, item.discountedPrice)}% OFF
+                </div>
+              )}
+            </div>
+
+            {/* Content Container */}
+            <div className="p-4 space-y-3">
+              {/* Brand & Title */}
+              <div>
+                <h3 className="font-medium text-gray-900 group-hover:text-pink-600 transition-colors">
+                  {truncateText(item.title, 20)}
+                </h3>
+                <p className="text-sm text-gray-500">{item.brand}</p>
               </div>
-              <div className="flex justify-between">
-                <p className="font-semibold">{item.brand}</p>
-                <p className="font-medium">
-                  <span className="mr-2 text-slate-400 line-through">₹{item.originalPrice}</span>
+
+              {/* Description */}
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {truncateText(item.description, 25)}
+              </p>
+
+              {/* Rating */}
+              <div className="flex items-center gap-1">
+                <div className="flex items-center bg-pink-100 px-2 py-1 rounded-md">
+                  <span className="text-sm font-medium text-pink-700 mr-1">
+                    {item.rating}
+                  </span>
+                  <Star className="w-4 h-4 text-pink-500 fill-pink-500" />
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold text-gray-900">
                   ₹{item.discountedPrice}
-                </p>
+                </span>
+                {item.originalPrice !== item.discountedPrice && (
+                  <span className="text-sm text-gray-500 line-through">
+                    ₹{item.originalPrice}
+                  </span>
+                )}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="pt-2 flex items-center justify-between border-t">
+                <div className="flex items-center text-sm text-pink-600">
+                  <Tag className="w-4 h-4 mr-1" />
+                  <span>Best Seller</span>
+                </div>
+                <span className="text-xs text-gray-600 font-medium">
+                  Free Delivery
+                </span>
               </div>
             </div>
           </div>
         ))
       ) : (
-        <p>No products available.</p>
+        <div className="text-center p-8 text-gray-500">No products available.</div>
       )}
     </div>
   );

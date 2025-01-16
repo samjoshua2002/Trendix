@@ -15,7 +15,7 @@ function Profile() {
   };
 
   return (
-    <div>
+    <div className='pt-24 sm:pt-20'>
       <h2>Profile</h2>
       <button 
         onClick={handleSignOut}

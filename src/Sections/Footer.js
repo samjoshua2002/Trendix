@@ -6,7 +6,7 @@ import { FaXTwitter } from "react-icons/fa6";
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-gray-100 via-gray-200  to-gray-300 py-12">
+    <footer className="bg-gradient-to-r from-gray-100 via-gray-200  to-gray-300 py-20">
       <div className="container mx-auto px-6">
         {/* Navigation Links */}
         <div className="flex flex-wrap justify-center text-gray-800 space-x-6 gap-y-3 font-medium text-lg">

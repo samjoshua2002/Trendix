@@ -6,8 +6,8 @@ import Contact from '../Sections/Contact';
 
 const About = () => {
   return (
-    <div>
-      <section className="overflow-hidden bg-white py-8 sm:py-5">
+    <div >
+      <section className="overflow-hidden bg-white py-24  sm:pt-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
             <div className="lg:pr-8 lg:pt-4">
@@ -19,23 +19,23 @@ const About = () => {
                   <div className="relative pl-9">
                     <dt className="inline font-semibold text-gray-900">
                       <FaShoppingCart className="absolute left-1 top-1 h-5 w-5 text-[#E23378]" />
-                      Easy Shopping
+                      Easy Shopping &nbsp;
                     </dt>
-                    <dd className="inline">Browse through a wide range of products with a user-friendly shopping cart experience.</dd>
+                    <dd className="inline" > Browse through a wide range of products with a user-friendly shopping cart experience.</dd>
                   </div>
                   <div className="relative pl-9">
                     <dt className="inline font-semibold text-gray-900">
                       <FaTag className="absolute left-1 top-1 h-5 w-5 text-[#E23378]" />
                       Exclusive Deals
                     </dt>
-                    <dd className="inline">Get the best discounts and exclusive deals only available at Trendix.</dd>
+                    <dd className="inline"> &nbsp; Get the best discounts and exclusive deals only available at Trendix.</dd>
                   </div>
                   <div className="relative pl-9">
                     <dt className="inline font-semibold text-gray-900">
                       <FaShippingFast className="absolute left-1 top-1 h-5 w-5 text-[#E23378]" />
                       Fast Delivery
                     </dt>
-                    <dd className="inline">Enjoy fast and reliable delivery services, ensuring your orders arrive on time.</dd>
+                    <dd className="inline"> &nbsp; Enjoy fast and reliable delivery services, ensuring your orders arrive on time.</dd>
                   </div>
                 </dl>
               </div>
@@ -114,7 +114,7 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section  >
 
       <Contact/>
       <Footer />

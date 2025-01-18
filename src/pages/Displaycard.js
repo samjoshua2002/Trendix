@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 import { AppContext } from "../App";
 import { BASE_URL } from "../App";
 import axios from "axios";
+import Comment from "./Comment";
 import { Star } from "react-feather"; // Importing Star icon
 import Navbar from "../Navbar";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Displaycard = () => {
+  
   const { allproducts, setCartCount } = useContext(AppContext);
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -212,7 +214,7 @@ const Displaycard = () => {
               )}
               </div>
               {product.discountedPrice && product.originalPrice && (
-                <p className="text-green-600 text-sm font-bold mt-2">
+                <p className="text-[#E23378] text-sm font-bold mt-2">
                   Save {calculateOfferPercent()}%!
                 </p>
               )}
@@ -284,6 +286,12 @@ const Displaycard = () => {
           </div>
         </div>
       </div>
+      <div className="  bg-gray-50  justify-start pb-16">
+  <Comment />
+</div>
+
+
+
     </div>
   );
 };

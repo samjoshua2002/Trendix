@@ -110,7 +110,7 @@ function MainContent({ isRegistered }) {
   return (
     <div>
       {/* Show Navbar only on specific routes */}
-      {["/home", "/cart", "/profile", "/collections", "/about", "/wishlist","/displaycard/:id"].includes(location.pathname) && <Navbar />}
+      {["/home","/cart", "/profile", "/collections", "/about", "/wishlist","/displaycard/:id"].includes(location.pathname) && <Navbar />}
 
       <Routes>
         <Route path="/" element={isRegistered ? <Navigate to="/home" /> : <Landing2 />} />

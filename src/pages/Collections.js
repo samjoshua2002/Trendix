@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SlidersHorizontal} from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
+import { FaSpinner, FaExclamationTriangle, FaHeartBroken } from 'react-icons/fa';
 import { AppContext } from '../App';
 import SmallCard from './SmallCard';
 
@@ -12,7 +13,9 @@ function Collection() {
     type: [],
   });
   const [sortOption, setSortOption] = useState('relevant');
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [ setShowMobileFilters] = useState(false);
+  const [loading] = useState(false);
+  const [error] = useState(null);
 
   const navigate = useNavigate();
 
@@ -156,13 +159,34 @@ function Collection() {
           {/* Product Grid */}
           <div className="flex-1">
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {filteredAndSortedProducts.map((product) => (
-                <SmallCard
-                  key={product.id}
-                  products={[product]}
-                  handleProductSelect={handleProductSelect}
-                />
-              ))}
+              {loading ? (
+                <div className="flex flex-col items-center text-center">
+                  <FaSpinner className="animate-spin text-gray-400 w-16 h-16 mt-56" />
+                  <p className="text-gray-500 text-lg">Loading products...</p>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center text-center">
+                  <FaExclamationTriangle className="text-red-500 w-16 h-16 mt-56" />
+                  <p className="text-red-500 text-lg">{error}</p>
+                </div>
+              ) : filteredAndSortedProducts.length > 0 ? (
+                filteredAndSortedProducts.map((product) => (
+                  <SmallCard
+                    key={product.id}
+                    products={[product]}
+                    handleProductSelect={handleProductSelect}
+                  />
+                ))
+              ) : (
+                <div className='flex items-center justify-center text-center'>
+                <div className="flex items-center justify-center text-center mt-52">
+                <FaHeartBroken className="text-gray-400  w-16 h-16 mb-4" />
+                <p className="text-gray-500 text-lg">No products found.</p>
+              </div>
+              
+            </div>
+              
+              )}
             </div>
           </div>
         </div>

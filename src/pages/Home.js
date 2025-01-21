@@ -78,7 +78,7 @@ function Home() {
       </section>
 
       {/* Best Sellers Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-8">
             <TrendingUp className="w-8 h-8 text-[#E23378]" />

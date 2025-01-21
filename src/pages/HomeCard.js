@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Heart, Star } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
+import { FaBoxOpen } from "react-icons/fa";
 
 const HomeCard = ({ products, classname }) => {
   const [items, setItems] = useState(products || []); // Initialize state with products or empty array
@@ -62,7 +63,10 @@ const HomeCard = ({ products, classname }) => {
           </div>
         ))
       ) : (
-        <p className="col-span-full text-center text-gray-500">No products available.</p>
+        <div className="col-span-full text-center">
+        <FaBoxOpen className="mx-auto w-16 h-16 text-gray-400" />
+        <p className="text-black mt-4">No products available.</p>
+      </div>
       )}
     </div>
   );

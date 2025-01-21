@@ -6,158 +6,168 @@ import axios from "axios";
 import Comment from "./Comment";
 import { Star } from "react-feather"; // Importing Star icon
 import Navbar from "../Navbar";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Displaycard = () => {
-  
-  const { allproducts, setCartCount } = useContext(AppContext);
+  const { allproducts, handleLikeToggle, setCartCount } =
+    useContext(AppContext);
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [image, setImage] = useState("");
   const [size, setSize] = useState(null);
   const [incart, setIncart] = useState(false);
+  const [sizes, setSizes] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [quans, setQuans] = useState(1);
 
   useEffect(() => {
-    const foundProduct = allproducts.find((p) => p.id === parseInt(id));
+    const foundProduct = allproducts.find(
+      (product) => product.id === parseInt(id)
+    );
     if (foundProduct) {
       setProduct(foundProduct);
       setImage(foundProduct.imageUrl);
     }
   }, [id, allproducts]);
 
+  const fetchCartCount = async () => {
+    try {
+      const email = localStorage.getItem("useremail");
+      if (!email) {
+        console.error("User email not found in localStorage.");
+        return;
+      }
+
+      const userResponse = await axios.get(
+        `${BASE_URL}/user/getuserid/${email}`
+      );
+      const userId = userResponse.data;
+
+      const response = await axios.get(`${BASE_URL}/cart/count/${userId}`);
+      setCartCount(response.data);
+    } catch (error) {
+      console.error("Error fetching cart count:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchCartStatus = async () => {
       try {
         const email = localStorage.getItem("useremail");
-        if (!email) throw new Error("User email not found in localStorage.");
+        if (!email) {
+          console.error("User email not found in localStorage.");
+          return;
+        }
 
-        const { data: userId } = await axios.get(
+        const userResponse = await axios.get(
           `${BASE_URL}/user/getuserid/${email}`
         );
-        const { data: isInCart } = await axios.get(
+        const userId = userResponse.data;
+
+        const response = await axios.get(
           `${BASE_URL}/cart/incart/${userId}/${id}`
         );
-        setIncart(isInCart);
+        setIncart(response.data);
       } catch (error) {
-        console.error("Error fetching cart status:", error.message);
+        console.error("Error fetching cart status:", error);
       }
     };
 
     fetchCartStatus();
-  }, [id]);
 
-  const fetchCartCount = async () => {
-    try {
-      const email = localStorage.getItem("useremail");
-      if (!email) throw new Error("User email not found in localStorage.");
+    const fetchSize = async () => {
+      try {
+        const email = localStorage.getItem("useremail");
+        if (!email) {
+          console.error("User email not found in localStorage.");
+          return;
+        }
 
-      const { data: userId } = await axios.get(
-        `${BASE_URL}/user/getuserid/${email}`
-      );
-      const { data: cartCount } = await axios.get(
-        `${BASE_URL}/cart/count/${userId}`
-      );
-      setCartCount(cartCount);
-    } catch (error) {
-      console.error("Error fetching cart count:", error.message);
-    }
-  };
+        const userResponse = await axios.get(
+          `${BASE_URL}/user/getuserid/${email}`
+        );
+        const userId = userResponse.data;
 
-  const addToCart = async () => {
+        const response = await axios.get(
+          `${BASE_URL}/cart/size/${userId}/${id}`
+        );
+        const quan = await axios.get(
+          `${BASE_URL}/cart/quantity/${userId}/${id}`
+        );
+        setSizes(response.data);
+        setQuans(quan.data);
+      } catch (error) {
+        console.error("Error fetching cart status:", error);
+      }
+    };
+    fetchSize();
+  }, [id, quans]);
+
+  const addToCart = async (product) => {
     if (!size) {
-     toast.info("Please select a size.");
+      toast.info("Please select a size.");
       return;
     }
     try {
       const email = localStorage.getItem("useremail");
-      if (!email) throw new Error("User email not found in localStorage.");
+      if (!email) {
+        console.error("User email not found in localStorage.");
+        return;
+      }
 
-      const { data: userId } = await axios.get(
+      const userResponse = await axios.get(
         `${BASE_URL}/user/getuserid/${email}`
       );
-      await axios.post(`${BASE_URL}/cart/addcart/${userId}/${product.id}`);
+      const userId = userResponse.data;
+
+      await axios.post(
+        `${BASE_URL}/cart/addcart/${userId}/${product.id}/${size}/${quantity}`
+      );
       setIncart(true);
+      setSizes(size);
+      setQuans(quantity);
       fetchCartCount();
+      toast.success("Added to cart successfully.");
     } catch (error) {
-      console.error("Error adding to cart:", error.message);
+      console.error(error);
     }
   };
 
-  const removeFromCart = async () => {
+  const remove = async (product) => {
     try {
       const email = localStorage.getItem("useremail");
-      if (!email) throw new Error("User email not found in localStorage.");
+      if (!email) {
+        console.error("User email not found in localStorage.");
+        return;
+      }
 
-      const { data: userId } = await axios.get(
+      const userResponse = await axios.get(
         `${BASE_URL}/user/getuserid/${email}`
       );
+      const userId = userResponse.data;
+
       await axios.delete(`${BASE_URL}/cart/delcart/${userId}/${product.id}`);
       setIncart(false);
+      setSizes(null);
+      setQuans(1);
       fetchCartCount();
     } catch (error) {
-      console.error("Error removing from cart:", error.message);
+      console.error(error);
     }
   };
 
-  const addToWishlist = async () => {
-    
-    try {
-      const email = localStorage.getItem("useremail");
-      if (!email) throw new Error("User email not found in localStorage.");
+  if (!product) {
+    return <div>Loading...</div>;
+  }
 
-      const { data: userId } = await axios.get(
-        `${BASE_URL}/user/getuserid/${email}`
-      );
-      await axios.post(
-        `${BASE_URL}/wishlist/addwishlist/${userId}/${product.id}`
-      );
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        isLiked: true,
-      }));
-    } catch (error) {
-      console.error("Error adding to wishlist:", error.message);
-    }
+  const calculateOfferPercent = (original, discounted) => {
+    return Math.round(((original - discounted) / original) * 100);
   };
-
-  const removeFromWishlist = async () => {
-    try {
-      const email = localStorage.getItem("useremail");
-      if (!email) throw new Error("User email not found in localStorage.");
-
-      const { data: userId } = await axios.get(
-        `${BASE_URL}/user/getuserid/${email}`
-      );
-      await axios.delete(
-        `${BASE_URL}/wishlist/delwishlist/${userId}/${product.id}`
-      );
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        isLiked: false,
-      }));
-    } catch (error) {
-      console.error("Error removing from wishlist:", error.message);
-    }
-  };
-
-  if (!product) return <div>Loading...</div>;
-
-  const calculateOfferPercent = () => {
-    if (product.originalPrice && product.discountedPrice) {
-      return Math.round(
-        ((product.originalPrice - product.discountedPrice) /
-          product.originalPrice) *
-          100
-      );
-    }
-    return 0;
-  };
-
   return (
     <div>
       <Navbar />
-      <ToastContainer/>
+      <ToastContainer />
       <div className="bg-gray-50 pt-24 sm:pt-20 pb-16" key={id}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-12">
@@ -203,15 +213,14 @@ const Displaycard = () => {
 
               {/* Prices */}
               <div className="flex  items-center gap-5">
-
-              <p className="mt-5 text-2xl font-semibold text-gray-900">
-                ₹{product.discountedPrice || product.originalPrice}
-              </p>
-              {product.discountedPrice && product.originalPrice && (
-                  <p className="text-lg mt-6 font-medium text-gray-500 line-through">
-                  ₹{product.originalPrice}
+                <p className="mt-5 text-2xl font-semibold text-gray-900">
+                  ₹{product.discountedPrice || product.originalPrice}
                 </p>
-              )}
+                {product.discountedPrice && product.originalPrice && (
+                  <p className="text-lg mt-6 font-medium text-gray-500 line-through">
+                    ₹{product.originalPrice}
+                  </p>
+                )}
               </div>
               {product.discountedPrice && product.originalPrice && (
                 <p className="text-[#E23378] text-sm font-bold mt-2">
@@ -222,38 +231,85 @@ const Displaycard = () => {
               <p className="mt-5 text-gray-600">{product.description}</p>
 
               {/* Select Size */}
-              {product.sizes && product.sizes.length > 0 && (
-                <div className="flex flex-col gap-4 mt-8">
-                  <p className="font-semibold text-gray-800">Select Size</p>
+              {incart ? (
+                <div className="mt-8">
+                  <p className="font-semibold text-gray-800">Selected Size</p>
                   <div className="flex gap-4">
-                    {product.sizes.map((sizeOption, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSize(sizeOption)}
-                        className={`border py-2 px-4 text-sm font-medium rounded-md ${
-                          size === sizeOption
-                            ? "border-black bg-gray-200"
-                            : "border-gray-300 bg-white"
-                        }`}
-                      >
-                        {sizeOption}
-                      </button>
-                    ))}
+                    <span className="border py-2 px-4 text-sm font-medium rounded-md border-black bg-gray-200">
+                      {sizes}
+                    </span>
                   </div>
                 </div>
+              ) : (
+                product.sizes &&
+                product.sizes.length > 0 && (
+                  <div className="flex flex-col gap-4 mt-8">
+                    <p className="font-semibold text-gray-800">Select Size</p>
+                    <div className="flex gap-4">
+                      {product.sizes.map((sizeOption, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSize(sizeOption)}
+                          className={`border py-2 px-4 text-sm font-medium rounded-md ${
+                            size === sizeOption
+                              ? "border-black bg-gray-200"
+                              : "border-gray-300 bg-white"
+                          }`}
+                        >
+                          {sizeOption}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
               )}
+              <div className="">
+                {incart ? (
+                  <>
+                    <div className="text-xl my-3">
+                      <span className="text-lg">Quantity : </span>
+                      {quans}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-gray-800 mt-3">
+                      Select Quantity
+                    </p>
+                    <div className="flex gap-4 items-center font-medium my-3">
+                      <div
+                        className="text-3xl border-2 rounded border-gray-300 cursor-pointer pb-2 px-3"
+                        onClick={() => {
+                          setQuantity(quantity > 1 ? quantity - 1 : quantity);
+                        }}
+                      >
+                        -
+                      </div>
+                      <div className="text-xl">{quantity}</div>
+                      <div
+                        className="text-3xl  border-2 rounded border-gray-300 cursor-pointer pb-2 px-2"
+                        onClick={() => {
+                          setQuantity(quantity + 1);
+                        }}
+                      >
+                        +
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
 
               <div className="flex gap-4 mt-6">
                 {incart ? (
                   <button
-                    onClick={removeFromCart}
+                    onClick={() => remove(product)}
                     className="flex items-center justify-center gap-2 w-48 text-white px-8 py-3 rounded-md transition-all bg-red-500 hover:bg-red-600"
                   >
                     Remove from cart
                   </button>
                 ) : (
                   <button
-                    onClick={addToCart}
+                    onClick={() => addToCart(product)}
                     className="flex items-center justify-center gap-2 w-48 text-white px-8 py-3 rounded-md transition-all bg-green-500 hover:bg-green-600"
                   >
                     Add to Cart
@@ -261,14 +317,20 @@ const Displaycard = () => {
                 )}
                 {product.isLiked ? (
                   <button
-                    onClick={removeFromWishlist}
+                    onClick={() => {
+                      handleLikeToggle(product.id);
+                      toast.info("Removed from wishlist");
+                    }}
                     className="flex items-center justify-center gap-2 w-48 text-white px-8 py-3 rounded-md transition-all bg-[#E23378] hover:bg-pink-500"
                   >
                     In Wishlist
                   </button>
                 ) : (
                   <button
-                    onClick={addToWishlist}
+                    onClick={() => {
+                      handleLikeToggle(product.id);
+                      toast.success("Added to wishlist");
+                    }}
                     className="flex items-center justify-center gap-2 w-48 text-black px-8 py-3 rounded-md transition-all bg-[#64748b] hover:bg-gray-100 border-black"
                   >
                     Add to Wishlist
@@ -287,11 +349,8 @@ const Displaycard = () => {
         </div>
       </div>
       <div className="  bg-gray-50  justify-start pb-16">
-  <Comment />
-</div>
-
-
-
+        <Comment />
+      </div>
     </div>
   );
 };

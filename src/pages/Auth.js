@@ -21,10 +21,11 @@ const Landing2 = () => {
   });
 
   const [userin, setUserin] = useState({
-    useremail: "", userpassword: ""
+    useremail: "",
+     userpassword: ""
   });
 
-  const [, setError] = useState({
+  const [setError] = useState({
     username: "",
     userpassword: ""
   });

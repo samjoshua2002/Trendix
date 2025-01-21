@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Csmallcard from "./HomeCard";
 import { BASE_URL } from "../App";
+import {  Sparkles } from 'lucide-react';
+import { FaSpinner, FaExclamationTriangle, FaHeartBroken } from "react-icons/fa";
 
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState([]);
@@ -71,30 +73,45 @@ const Wishlist = () => {
   return (
     <div className="bg-white  shadow-sm  py-20 sm:pt-20">
 
-      {/* Banner with Collections Heading */}
-      <div className="absolute sm:left-16 w-full bg-gradient-to-r p-4">
-        <h1 className="text-3xl font-semibold">Wishlist</h1>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-full mx-auto px-4  sm:px-20 pt-20 sm:pt-16">
-        <div className="flex items-center justify-center">
-          {loading ? (
-            <p className="text-center text-gray-500">Loading wishlist...</p>
-          ) : error ? (
-            <p className="text-center text-red-500">{error}</p>
-          ) : wishlistProducts.length > 0 ? (
-            <Csmallcard
-              products={wishlistProducts} // Pass the entire array as products
-              classname="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-9"
 
-              handleLikeToggle={handleLikeToggle} // Pass handleLikeToggle to SmallCard
-            />
-          ) : (
-            <p className="text-center text-gray-500">Your wishlist is empty.</p>
-          )}
-        </div>
+
+<div className="relative w-full p-6 ">
+  <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-10 gap-4">
+    <Sparkles className="text-gray-400 w-12 h-12" />
+    <h1 className="text-4xl font-semibold text-gray-400">Wishlist</h1>
+  </div>
+</div>
+     
+
+{/* Main Content */}
+<div className="max-w-full mx-auto px-4 sm:px-20  sm:pt-12">
+  <div className="flex items-center justify-center min-h-[300px]">
+    {loading ? (
+      <div className="flex flex-col items-center text-center">
+        <FaSpinner className="animate-spin text-gray-400 w-16 h-16 mt-56" />
+        <p className="text-gray-500 text-lg">Loading wishlist...</p>
       </div>
+    ) : error ? (
+      <div className="flex flex-col items-center text-center">
+        <FaExclamationTriangle className="text-red-500 w-16 h-16 mt-56" />
+        <p className="text-red-500 text-lg">{error}</p>
+      </div>
+    ) : wishlistProducts.length > 0 ? (
+      <Csmallcard
+        products={wishlistProducts} // Pass the entire array as products
+        classname="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-9"
+        handleLikeToggle={handleLikeToggle} // Pass handleLikeToggle to SmallCard
+      />
+    ) : (
+      <div className="flex flex-col items-center text-center mt-52">
+        <FaHeartBroken className="text-gray-400 w-16 h-16 mb-4" />
+        <p className="text-gray-500 text-lg">Your wishlist is empty.</p>
+      </div>
+    )}
+  </div>
+</div>
+
     </div>
   );
 };

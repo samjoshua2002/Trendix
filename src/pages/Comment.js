@@ -51,7 +51,7 @@ const Comment = () => {
         try {
             const response = await axios.post(`${BASE_URL}/review/addreview/${userId}/${productId}`, {
                 comment: newComment,
-                rating: 5,
+                date: new Date().toISOString() 
             });
             if (response.status === 200) {
                 setComments([...comments, { userId, productId, comment: newComment, rating: 5 }]);
@@ -98,7 +98,7 @@ const Comment = () => {
                                         {comment.username || 'Anonymous'}
                                     </span>
                                     <span className="text-sm text-gray-500">
-                                        {new Date().toLocaleDateString()}
+                                        {comment.date}
                                     </span>
                                 </div>
                                 <p className="text-gray-700 leading-relaxed">

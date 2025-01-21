@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import {  ShoppingBag, Trash2 } from "lucide-react";
 import { BASE_URL } from "../App";
 
 const Cart = () => {

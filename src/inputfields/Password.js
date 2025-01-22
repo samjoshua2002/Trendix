@@ -25,8 +25,10 @@ const Password = ({ helperText, name, onChange, value, className }) => {
       <InputLabel
         htmlFor={`outlined-adornment-${name}`}
         sx={{
-          color: 'white',
-          '&.Mui-focused': { color: 'white' }, // Label color when focused
+          color: 'black', // Label color when not focused
+          backgroundColor: 'white', // White background for the label
+          paddingLeft: '4px', // Padding to prevent label overlap
+          '&.Mui-focused': { color: "#E23378",  }, // Label color when focused
         }}
       >
         Password
@@ -48,7 +50,7 @@ const Password = ({ helperText, name, onChange, value, className }) => {
               onClick={handleClickShowPassword}
               onMouseDown={handleMouseDownPassword}
               edge="end"
-              sx={{ color: 'white' }} // Icon color
+              sx={{ color: 'black' }} // Icon color
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </IconButton>
@@ -59,28 +61,28 @@ const Password = ({ helperText, name, onChange, value, className }) => {
           backdropFilter: 'blur(10px)', // Glass blur effect
           backgroundColor: 'rgba(255, 255, 255, 0.1)', // Translucent background
           borderRadius: '8px', // Rounded corners
-          color: 'white', // Text color
+          color: 'black', // Text color
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.4)', // Default translucent border
+            borderColor: 'black', // Black border for default state
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.6)', // Border color on hover
+            borderColor: 'rgba(0, 0, 0, 0.7)', // Darker gray for hover
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(0, 123, 255, 0.8)', // Blue border on focus
+            borderColor: '#E23378', // Pink border on focus
           },
           input: {
-            color: 'white', // Input text color
+            color: 'black', // Input text color
           },
           '& input:-webkit-autofill': {
             WebkitBoxShadow: '0 0 0px 1000px rgba(255, 255, 255, 0.1) inset', // Prevent autofill background
-            WebkitTextFillColor: 'white', // Autofill text color
+            WebkitTextFillColor: 'black', // Autofill text color
             borderRadius: '8px',
           },
         }}
       />
       {helperText && (
-        <FormHelperText sx={{ color: 'white', marginLeft: '10px' }}>
+        <FormHelperText sx={{ color: "#E23378", marginLeft: '10px' }}>
           {helperText}
         </FormHelperText>
       )}

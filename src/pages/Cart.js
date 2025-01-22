@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {  ShoppingBag, Trash2 } from "lucide-react";
+import { ShoppingBag, Trash2 } from "lucide-react";
 import { BASE_URL } from "../App";
 
 const Cart = () => {
@@ -69,11 +69,54 @@ const Cart = () => {
     navigate(`/displaycard/${product.id}`);
   };
 
+  const handleCheckout = async () => {
+    try {
+      const email = localStorage.getItem("useremail");
+      const userResponse = await axios.get(`${BASE_URL}/user/getuserid/${email}`);
+      const userId = userResponse.data;
+
+      // Calculate totals
+      const totalDiscounted = cartProducts.reduce((sum, product) => {
+        const quantity = quantities[product.id] || 1;
+        return sum + (product.discountedPrice || product.originalPrice) * quantity;
+      }, 0);
+
+      const tax = Math.round(totalDiscounted * 0.1);
+      const shipping = 99; // Fixed shipping cost
+      const total = totalDiscounted + tax + shipping;
+
+      // Prepare the message content for the email
+      let message = `Order Details for ${email}:\n\n`;
+
+      cartProducts.forEach((product) => {
+        const quantity = quantities[product.id] || 1;
+        const totalPrice = product.discountedPrice
+          ? product.discountedPrice * quantity
+          : product.originalPrice * quantity;
+        message += `Product: ${product.title}\nQuantity: ${quantity}\nPrice: ₹${totalPrice}\n\n`;
+      });
+
+      message += `Subtotal: ₹${totalDiscounted}\nTax: ₹${tax}\nShipping: ₹${shipping}\nTotal: ₹${total}`;
+
+      // Send the email
+      const orderData = {
+        name: localStorage.getItem("username"),// Use the name as Aura
+        email: email,
+        message: message,
+      };
+
+      await axios.post(`${BASE_URL}/checkout`, orderData);
+
+      // Optionally, navigate to a confirmation page or show a success message
+      navigate("/order-confirmation");
+    } catch (error) {
+      console.error("Error during checkout:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCart();
   }, []);
-
-
 
   const totalDiscounted = cartProducts.reduce((sum, product) => {
     const quantity = quantities[product.id] || 1;
@@ -101,7 +144,7 @@ const Cart = () => {
         </div>
 
         {cartProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+          <div className="text-center py-28 bg-white rounded-lg shadow-sm">
             <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-medium text-gray-900 mb-2">Your cart is empty</h2>
             <p className="text-gray-500 mb-6">Looks like you haven't added anything yet.</p>
@@ -159,7 +202,6 @@ const Cart = () => {
                             className="flex items-center px-3 py-3 border rounded-md bg-gray-100 text-sm text-[#E23378] hover:text-red-600 transition-colors duration-200"
                           >
                             <Trash2 className="w-4 h-4   " />
-                            
                           </button>
                         </div>
                       </div>
@@ -209,21 +251,18 @@ const Cart = () => {
                     <span className="text-gray-900">₹{shipping}</span>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between">
-                      <span className="text-base font-semibold text-gray-900">Total</span>
-                      <span className="text-xl font-semibold text-[#E23378]">₹{total}</span>
-                    </div>
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span>Total</span>
+                    <span className="text-[#E23378]">₹{total}</span>
                   </div>
                 </div>
 
-                <button className="w-full mt-6 bg-[#E23378] text-white py-3 px-4 rounded-md font-medium hover:bg-[#c92e69] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E23378] transition-colors duration-200">
+                <button
+                  onClick={handleCheckout}
+                  className="mt-6 w-full py-3 text-white bg-[#E23378] rounded-md hover:bg-[#c92e69] transition-colors duration-200"
+                >
                   Proceed to Checkout
                 </button>
-
-                <p className="mt-4 text-xs text-center text-gray-500">
-                  Secure checkout powered by Stripe
-                </p>
               </div>
             </div>
           </div>

@@ -9,6 +9,7 @@ function Profile() {
     
     
     localStorage.setItem('trendix', 'false');
+   
     
     // Navigate to the landing page
     navigate('/landing');

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import TextInput from '../inputfields/TextInput';
-import Password from '../inputfields/Password';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import TextInput from "../inputfields/TextInput";
+import Password from "../inputfields/Password";
+import axios from "axios";
 import "../App.css";
-import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import {BASE_URL} from "../App"
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { BASE_URL } from "../App";
 
 const Landing2 = () => {
   const [videoSource] = useState("/vid.mp4");
@@ -17,25 +17,23 @@ const Landing2 = () => {
     usernumber: "",
     useremail: "",
     userpassword: "",
-    userotp: ""
+    userotp: "",
   });
 
   const [userin, setUserin] = useState({
     useremail: "",
-     userpassword: ""
+    userpassword: "",
   });
 
-  const [setError] = useState({
+  const [registrationStep, setRegistrationStep] = useState("initial"); // initial, otpSent, otpVerified
+  const [error, setError] = useState({
     username: "",
-    userpassword: ""
+    userpassword: "",
   });
-
 
   const [change, setChange] = useState({
     signIn: true,
     register: false,
-    otpverify: false,
-    setpassword: false
   });
 
   const handleChange = (e) => {
@@ -47,17 +45,25 @@ const Landing2 = () => {
   };
 
   const signin = () => {
-    setChange({ ...change, signIn: true, register: false });
+    setChange({ signIn: true, register: false });
     clearForm();
+    setRegistrationStep("initial");
   };
 
   const signup = () => {
-    setChange({ ...change, signIn: false, register: true });
+    setChange({ signIn: false, register: true });
     clearForm1();
+    setRegistrationStep("initial");
   };
- 
-  const sendotp = async (e) => {
+
+  const sendOTP = async (e) => {
     e.preventDefault();
+
+    if (!user.username || !user.useremail || !user.usernumber) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     try {
       const userData = {
         username: user.username,
@@ -65,14 +71,12 @@ const Landing2 = () => {
         usernumber: user.usernumber ? parseInt(user.usernumber, 10) : null,
       };
       const response = await axios.post(`${BASE_URL}/user/register`, userData);
-      console.log(response);
+
       if (response.data === "Registered successfully") {
-        toast.success(`OTP sent to your mail-id: ${user.useremail}`);
-        setChange((prevstate) => ({ ...prevstate, otpverify: !change.otpverify, register: !change.register }));
-      } else if (response.data === "Account already exists") {
-        toast.error("Account already exists.");
+        toast.success(`OTP sent to your email: ${user.useremail}`);
+        setRegistrationStep("otpSent");
       } else {
-        toast.error(response.data.message || "Registration failed. Please try again.");
+        toast.error(response.data || "Failed to send OTP. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -80,28 +84,24 @@ const Landing2 = () => {
     }
   };
 
-  const verifyotp = async (e) => {
-    if (user.userotp === "") {
-      toast.info("Please enter the OTP.");
+  const verifyOTP = async (e) => {
+    e.preventDefault();
+    if (!user.userotp) {
+      toast.error("Please enter the OTP");
       return;
     }
-    e.preventDefault();
+
     try {
-      const userData = {
-        userotp: user.userotp,
-        useremail: user.useremail
-      };
-      const response = await axios.post(`${BASE_URL}/user/verify-otp/${userData.useremail}/${userData.userotp}`);
-      console.log(response);
+      const response = await axios.post(
+        `${BASE_URL}/user/verify-otp/${user.useremail}/${user.userotp}`
+      );
+
       if (response.data === "User verified") {
-        toast.info(`User ${user.username} verified`);
-        setChange((prevstate) => ({
-          ...prevstate,
-          setpassword: true,
-          otpverify: false
-        }));
+        localStorage.setItem("username", user.username);
+        toast.success("OTP verified successfully");
+        setRegistrationStep("otpVerified");
       } else {
-        toast.error(response.data.message || "Invalid OTP. Please try again.");
+        toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -109,79 +109,78 @@ const Landing2 = () => {
     }
   };
 
+  const completeRegistration = async (e) => {
+    e.preventDefault();
+    if (!user.userpassword) {
+      toast.error("Please enter a password");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/user/setpassword/${user.useremail}/${user.userpassword}`
+      );
+
+      if (response.data === "Password has been set successfully.") {
+        toast.success("Registration successful! Please login to continue.");
+        setChange({ signIn: true, register: false });
+        clearForm();
+        setRegistrationStep("initial");
+      } else {
+        toast.error("Failed to set password. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to complete registration. Please try again.");
+    }
+  };
+
   const clearForm1 = () => {
     setUserin({
-      useremail: '',
-      userpassword: '',
+      useremail: "",
+      userpassword: "",
     });
-    setError({});
+    setError({
+      username: "",
+      userpassword: "",
+    });
   };
 
   const clearForm = () => {
     setUser({
-      username: '',
-      usernumber: '',
-      useremail: '',
-      userpassword: '',
+      username: "",
+      usernumber: "",
+      useremail: "",
+      userpassword: "",
+      userotp: "",
     });
-    setError({});
-  };
-
-  const onSignup = async (e) => {
-    e.preventDefault();
-    try {
-      const userData = {
-        userpassword: user.userpassword,
-        useremail: user.useremail
-      };
-      const response = await axios.post(`${BASE_URL}/user/setpassword/${userData.useremail}/${userData.userpassword}`);
-      console.log(response);
-      if (response.data === "Password has been set successfully.") {
-        toast.success("Signup successful. Please login to continue.");
-        localStorage.setItem('trendix', 'true');
-        localStorage.setItem('useremail', user.useremail);
-        setChange((prevstate) => ({
-          ...prevstate, signIn: true,
-          register: false,
-          otpverify: false,
-          setpassword: false
-        }));
-      } else {
-        toast.error(response.data.message || "Signup failed. Please try again.");
-      }
-      setUser({
-        username: "",
-        usernumber: "",
-        useremail: "",
-        userpassword: "",
-        userotp: ""
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to set password. Please try again.");
-    }
+    setError({
+      username: "",
+      userpassword: "",
+    });
   };
 
   const onSignin = async (e) => {
     e.preventDefault();
     try {
-      if (userin.useremail === "" || userin.userpassword === "") {
-        toast.error("Enter your registered email or password!");
+      if (!userin.useremail || !userin.userpassword) {
+        toast.error("Enter your registered email and password!");
         return;
       }
-      const response = await axios.get(`${BASE_URL}/user/login/${userin.useremail}/${userin.userpassword}`);
+      const response = await axios.get(
+        `${BASE_URL}/user/login/${userin.useremail}/${userin.userpassword}`
+      );
       const message = response.data;
 
-      console.log("Response Message:", message);
-
       if (message.startsWith("Welcome")) {
-        localStorage.setItem('trendix', 'true');
-        localStorage.setItem('useremail', userin.useremail);
+        localStorage.setItem("trendix", "true");
+        localStorage.setItem("useremail", userin.useremail);
+
         toast.success(message);
         navigate("/home");
         setUserin({
           useremail: "",
-          userpassword: ""
+          userpassword: "",
         });
       } else if (message === "Invalid password") {
         toast.error("The password entered is incorrect. Please try again.");
@@ -200,8 +199,10 @@ const Landing2 = () => {
     e.preventDefault();
     try {
       if (userin.useremail) {
+        const response = await axios.get(
+          `${BASE_URL}/user/forgotpass/${userin.useremail}`
+        );
         toast.success("Mail sent to your registered email");
-        const response = await axios.get(`${BASE_URL}/user/forgotpass/${userin.useremail}`);
         console.log(response.data);
       } else {
         toast.error("Please enter your registered email");
@@ -213,178 +214,184 @@ const Landing2 = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('trendix') === 'true') {
+    if (localStorage.getItem("trendix") === "true") {
       navigate("/home");
     }
   }, [navigate]);
 
   return (
     <>
-    <ToastContainer />
-      <div className="h-svh flex justify-center items-center relative">
-        {/* Background Layer with iframe */}
-        <video
-          title="Video Background"
-          className="absolute inset-0 w-full h-[100vh] object-cover border-none"
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src={videoSource} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+      <ToastContainer />
+      <div className="min-h-screen w-full flex">
+        {/* Left side - Form */}
+        <div className="w-full lg:w-1/2 min-h-screen  flex items-center justify-center p-4">
+          {/* bg-[#F2F3F7] */}
+          <div className="w-full max-w-md">
+            <div className="px-6 py-8 md:px-8">
+              <h1
+                className="text-[#E23378] text-4xl md:text-5xl text-center font-semibold mb-8"
+                style={{ fontFamily: "Pacifico, sans-serif" }}
+              >
+                Trendix
+              </h1>
 
-        {/* Foreground Container with Overlay */}
-        <div className="w-[530px] h-[690px] rounded-md mx-5 bg-no-repeat bg-cover relative z-10">
-          {/* Overlay Layer */}
-          <div className="absolute inset-0 bg-black opacity-90 blur-3xl rounded-md"></div>
+              {change.signIn ? (
+                <>
+                  <h2 className="text-gray-800 text-2xl text-center mb-8 font-medium">
+                    Welcome Back
+                  </h2>
+                  <div className="space-y-6">
+                    <TextInput
+                      className="w-full bg-gray-50"
+                      name="useremail"
+                      type="email"
+                      label="Email"
+                      value={userin.useremail}
+                      onChange={handleChange1}
+                      helperText="enter email"
+                    />
 
-          {/* Text Content */}
-          <div className="relative z-20 text-white brand text-7xl text-center mt-28 lg:text-3xl font-semibold" style={{ fontFamily: "Pacifico, sans-serif" }}>
-            Trendix
-          </div>
+                    <Password
+                      name="userpassword"
+                      value={userin.userpassword}
+                      className="w-full bg-gray-50"
+                      helperText="8 characters with @ or # and numbers"
+                      onChange={handleChange1}
+                    />
 
-          {change.signIn && (
-            <>
-              <div className="relative z-20 text-slate-300 text-2xl text-center my-12">User Login</div>
-              <div className="relative z-20 signin m-4">
-                <div>
+                    <div className="flex items-center justify-between text-sm">
+                      <button
+                        onClick={password}
+                        className="text-gray-600 hover:text-[#E23378] transition-colors"
+                      >
+                        Forgot Password?
+                      </button>
+                      <button
+                        onClick={signup}
+                        className="text-gray-600 hover:text-[#E23378] transition-colors"
+                      >
+                        New User? Sign Up
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={onSignin}
+                      className="w-full py-3 px-4 bg-[#E23378] text-white rounded-lg font-medium 
+                             hover:bg-[#E23378]/90 transform hover:scale-[1.02] transition-all duration-200
+                             focus:outline-none focus:ring-2 focus:ring-[#E23378] focus:ring-offset-2"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-6">
+                  <h2 className="text-gray-800 text-2xl text-center mb-8 font-medium">
+                    Create Account
+                  </h2>
+
                   <TextInput
-                    className="w-full"
+                    className="w-full bg-gray-50"
+                    name="username"
+                    type="text"
+                    label="Name"
+                    value={user.username}
+                    onChange={handleChange}
+                    helperText="all letters without special symbols"
+                    disabled={registrationStep !== "initial"}
+                  />
+
+                  <TextInput
+                    className="w-full bg-gray-50"
+                    name="usernumber"
+                    type="number"
+                    label="Number"
+                    value={user.usernumber}
+                    onChange={handleChange}
+                    helperText="10 digits"
+                    disabled={registrationStep !== "initial"}
+                  />
+
+                  <TextInput
+                    className="w-full bg-gray-50"
                     name="useremail"
                     type="email"
                     label="Email"
-                    value={userin.useremail}
-                    onChange={handleChange1}
-                    helperText={"enter email"}
+                    value={user.useremail}
+                    onChange={handleChange}
+                    helperText="valid email"
+                    disabled={registrationStep !== "initial"}
                   />
+
+                  {registrationStep !== "initial" && (
+                    <TextInput
+                      className="w-full bg-gray-50"
+                      name="userotp"
+                      type="number"
+                      label="OTP"
+                      value={user.userotp}
+                      onChange={handleChange}
+                      helperText="Enter OTP sent to your email"
+                      disabled={registrationStep === "otpVerified"}
+                    />
+                  )}
+
+                  {registrationStep === "otpVerified" && (
+                    <Password
+                      name="userpassword"
+                      value={user.userpassword}
+                      className="w-full bg-gray-50"
+                      helperText="8 characters with @ or # and numbers"
+                      onChange={handleChange}
+                    />
+                  )}
+
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={signin}
+                      className="text-gray-600 text-sm hover:text-[#E23378] transition-colors"
+                    >
+                      Already have an account? Sign In
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={
+                      registrationStep === "initial"
+                        ? sendOTP
+                        : registrationStep === "otpSent"
+                        ? verifyOTP
+                        : completeRegistration
+                    }
+                    className="w-full py-3 px-4 bg-[#E23378] text-white rounded-lg font-medium 
+                           hover:bg-[#E23378]/90 transform hover:scale-[1.02] transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-[#E23378] focus:ring-offset-2"
+                  >
+                    {registrationStep === "initial"
+                      ? "Send OTP"
+                      : registrationStep === "otpSent"
+                      ? "Verify OTP"
+                      : "Complete Registration"}
+                  </button>
                 </div>
-
-                <div className="mt-2">
-                  <Password
-                    name="userpassword"
-                    value={userin.userpassword}
-                    className="w-full"
-                    helperText={"8 characters with @ or # and numbers"}
-                    onChange={handleChange1}
-                  />
-                  <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
-                    <span onClick={password}>forget<span className="text-slate-400 pr-1"> Password?</span></span>
-                    <span onClick={signup}><span className="text-slate-400 pr-1">New User</span> SignUp</span>
-                  </p>
-                </div>
-                <ToastContainer />
-
-                <div
-                  onClick={onSignin}
-                  className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-                >
-                  Sign In
-                </div>
-              </div>
-            </>
-          )}
-
-          {change.register && (
-            <div className="signup m-3 relative z-20">
-              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">User Register</div>
-              <div>
-                <TextInput
-                  className="form-control"
-                  name="username"
-                  type="text"
-                  label="Name"
-                  value={user.username}
-                  onChange={handleChange}
-                  helperText="all letters without special symbols"
-                />
-              </div>
-              <ToastContainer />
-
-              <div className="mt-2">
-                <TextInput
-                  className="form-control"
-                  name="usernumber"
-                  type="number"
-                  label="Number"
-                  value={user.usernumber}
-                  onChange={handleChange}
-                  helperText="10 digits"
-                />
-              </div>
-
-              <div className="mt-2">
-                <TextInput
-                  className="form-control"
-                  name="useremail"
-                  type="email"
-                  label="Email"
-                  value={user.useremail}
-                  onChange={handleChange}
-                  helperText="valid email"
-                />
-              </div>
-
-              <p className="my-3 font-semibold text-white pl-3 text-sm cursor-pointer flex justify-between">
-                <span></span>
-                <span onClick={signin}><span className="text-slate-400 pr-1">already have an account</span> SignIn</span>
-              </p>
-
-              <div
-                onClick={sendotp}
-                className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-              >
-                Send OTP
-              </div>
+              )}
             </div>
-          )}
+          </div>
+        </div>
 
-          {change.otpverify && (
-            <div className="relative z-20 otpverify m-3">
-              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">Verify OTP</div>
-              <div className="mt-2">
-                <TextInput
-                  className="form-control"
-                  name="userotp"
-                  type="number"
-                  label="OTP"
-                  value={user.userotp}
-                  onChange={handleChange}
-                  helperText="check your email for OTP"
-                />
-              </div>
-
-              <div
-                onClick={verifyotp}
-                className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-              >
-                Verify OTP
-              </div>
-            </div>
-          )}
-
-          {change.setpassword && (
-            <div className="relative z-20 setpassword m-3">
-              <div className="text-slate-300 text-2xl text-center mt-12 mb-8">Set Password</div>
-              <div className="mt-2">
-                <Password
-                  name="userpassword"
-                  value={user.userpassword}
-                  className="w-full"
-                  helperText="8 characters with @ or # and numbers"
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div
-                onClick={onSignup}
-                className="w-24 rounded-md mt-4 py-2 mx-auto text-center border-2 bg-[#E23378] border-[#E23378] text-white md:bg-transparent md:text-[#E23378] font-medium cursor-pointer hover:bg-[#E23378] hover:text-white"
-              >
-                Set Password
-              </div>
-            </div>
-          )}
+        {/* Right side - Image (hidden on mobile) */}
+        <div className="hidden lg:block w-1/2 relative">
+          <video
+            className="absolute inset-0 w-full h-[100vh] object-cover border-none"
+            autoPlay
+            loop
+            muted
+            playsInline
+            
+          >
+            <source src={videoSource} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </div>
     </>

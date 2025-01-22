@@ -68,7 +68,8 @@ function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
   {topOffers.length > 0 ? (
-    <SmallCard products={topOffers} />
+    <SmallCard products={topOffers}
+    classname="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8" />
   ) : (
     <p>No top offers available</p>
   )}
@@ -108,7 +109,8 @@ function Home() {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
                 {products.length > 0 ? (
-                  <SmallCard products={products} />
+                  <SmallCard products={products}
+                  classname="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8" />
                 ) : (
                   <p>No products available</p>
                 )}

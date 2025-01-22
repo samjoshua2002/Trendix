@@ -11,6 +11,7 @@ import Navbar from "./Navbar";
 import Landing2 from "./pages/Auth";
 import Form from "./pages/Form";
 import Displaycard from "./pages/Displaycard";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 // Create a context
 export const AppContext = createContext();
@@ -123,6 +124,7 @@ function MainContent({ isRegistered }) {
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<Form />} />
         <Route path="/displaycard/:id" element={<Displaycard/>} />
+        <Route path="/order-confirmation" element={<OrderConfirmation/>} />
       </Routes>
     </div>
   );

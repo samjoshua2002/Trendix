@@ -8,11 +8,34 @@ const Cart = () => {
   const [cartProducts, setCartProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
+  const [ setError] = useState('');
 
   const calculateOfferPercent = (original, discounted) => {
     return Math.round(((original - discounted) / original) * 100);
   };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const email = localStorage.getItem("useremail");
+      if (!email) {
+        navigate('/landing');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:8081/user/profile/${email}`);
+        setProfile(response.data);
+      } catch (err) {
+        setError('Failed to load profile');
+        console.error('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate])
 
   const fetchCart = async () => {
     try {
@@ -75,14 +98,14 @@ const Cart = () => {
       const userResponse = await axios.get(`${BASE_URL}/user/getuserid/${email}`);
       const userId = userResponse.data;
 
-      // Calculate totals
+     
       const totalDiscounted = cartProducts.reduce((sum, product) => {
         const quantity = quantities[product.id] || 1;
         return sum + (product.discountedPrice || product.originalPrice) * quantity;
       }, 0);
 
       const tax = Math.round(totalDiscounted * 0.1);
-      const shipping = 99; // Fixed shipping cost
+      const shipping = 99;
       const total = totalDiscounted + tax + shipping;
 
       // Prepare the message content for the email
@@ -100,7 +123,7 @@ const Cart = () => {
 
       // Send the email
       const orderData = {
-        name: localStorage.getItem("username"),// Use the name as Aura
+        name: profile.username,// Use the name as Aura
         email: email,
         message: message,
       };

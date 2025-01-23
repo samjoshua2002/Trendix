@@ -4,7 +4,7 @@ import { AppContext } from "../App";
 import { BASE_URL } from "../App";
 import axios from "axios";
 import Comment from "./Comment";
-import { Star, Heart, ChevronLeft, Truck, Shield, RefreshCw } from "lucide-react";
+import { Star, Heart, Truck, Shield, RefreshCw } from "lucide-react";
 import Navbar from "../Navbar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,8 +19,8 @@ const Displaycard = () => {
   const [sizes, setSizes] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [quans, setQuans] = useState(1);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isImageHovered, setIsImageHovered] = useState(false);
+
+  const [ setIsImageHovered] = useState(false);
 
   useEffect(() => {
     const foundProduct = allproducts.find(

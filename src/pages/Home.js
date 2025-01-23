@@ -66,7 +66,7 @@ function Home() {
             <Tag className="w-8 h-8 text-[#E23378]" />
             <h2 className="text-3xl font-bold text-gray-900">Top Offers</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
+          <div className="w-full">
   {topOffers.length > 0 ? (
     <SmallCard products={topOffers}
     classname="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8" />
@@ -85,7 +85,7 @@ function Home() {
             <TrendingUp className="w-8 h-8 text-[#E23378]" />
             <h2 className="text-3xl font-bold text-gray-900">Best Sellers</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
+          <div className="w-full">
             {bestSellers.length > 0 ? (
               <SmallCard products={bestSellers}  />
             ) : (
@@ -107,7 +107,7 @@ function Home() {
               <h3 className="text-xl font-semibold text-gray-800 mb-6">
                 {category.charAt(0).toUpperCase() + category.slice(1)}'s Collection
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
+              <div className="w-full">
                 {products.length > 0 ? (
                   <SmallCard products={products}
                   classname="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8" />

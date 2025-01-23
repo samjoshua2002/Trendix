@@ -1,28 +1,59 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import { Home, ShoppingCart, Heart, Info, ShoppingBag } from "lucide-react"; 
-import { motion } from "framer-motion"; 
+import { Home, ShoppingCart, Heart, Info, ShoppingBag } from "lucide-react";
+import { motion } from "framer-motion";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [value, setValue] = useState(0);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const email = localStorage.getItem("useremail");
+      if (!email) {
+        navigate("/landing");
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8081/user/profile/${email}`
+        );
+        setProfile(response.data);
+      } catch (err) {
+        setError("Failed to load profile");
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   return (
-    <div className="relative" style={{ WebkitTapHighlightColor: "transparent" }}>
+    <div
+      className="relative"
+      style={{ WebkitTapHighlightColor: "transparent" }}
+    >
       <motion.nav
         className="fixed top-0 left-0 w-full cursor-pointer z-50 bg-white/30 backdrop-blur-md "
-        initial={{ y: 0 }} 
+        initial={{ y: 0 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 10 }}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         <div className="lg:px-10 py-4 ml-10 mr-10 flex justify-between items-center relative">
-        
           {/* Black Logo */}
           <div className="text-black text-3xl font-semibold fancy-font">
             Trendix
           </div>
-          
+
           {/* Navigation Links for Desktop */}
           <div className="hidden md:flex items-center gap-5 justify-center flex-grow">
             <ul className="flex text-white gap-5 font-serif">
@@ -33,7 +64,10 @@ export default function Navbar() {
                 </Link>
               </li>
               <li className="relative group">
-                <Link to="/collections" className="text-black hover:text-pink-700">
+                <Link
+                  to="/collections"
+                  className="text-black hover:text-pink-700"
+                >
                   Collections
                   <span className="absolute left-1/2 bottom-[-4px] transform -translate-x-1/2 w-0 h-0.5 bg-pink-700 transition-all group-hover:w-1/2"></span>
                 </Link>
@@ -60,12 +94,16 @@ export default function Navbar() {
           </div>
 
           {/* Profile Picture with Link */}
-          <Link to="/profile" className="w-12 h-12 rounded-full overflow-hidden border-3 border-gray">
-            <img
-              src="https://i.pinimg.com/736x/eb/42/f5/eb42f58ee7be658c8a64205394d0ff02.jpg" // Replace with your profile picture path
-              alt="Profile"
-              className="w-full h-full object-cover rounded-full"
-            />
+          <Link to="/profile" className="overflow-hidden border-3 border-gray">
+            <div className="flex justify-center">
+              {profile && (
+                <div className="w-8 h-8 rounded-full bg-black  flex items-center justify-center hover:bg-pink-600">
+                  <span className="text-sm font-bold text-white">
+                    {profile.username.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
           </Link>
         </div>
       </motion.nav>

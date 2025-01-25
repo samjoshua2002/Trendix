@@ -20,7 +20,7 @@ const Displaycard = () => {
   const [quantity, setQuantity] = useState(1);
   const [quans, setQuans] = useState(1);
 
-  const [ setIsImageHovered] = useState(false);
+  const [ I, setIsImageHovered] = useState(false);
 
   useEffect(() => {
     const foundProduct = allproducts.find(

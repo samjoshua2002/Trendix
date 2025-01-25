@@ -42,16 +42,18 @@ function Profile() {
     if (!profile || !window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       return;
     }
-
+  
     try {
-      // Add your delete account API endpoint here
-      // await axios.delete(`http://localhost:8081/user/delete/${profile.userid}`);
+      const email = profile.useremail; 
+      await axios.delete(`${BASE_URL}/user/deleteuser/${email}`);
+      alert('Your account has been deleted successfully.');
       handleSignOut();
     } catch (err) {
       setError('Failed to delete account');
       console.error('Error deleting account:', err);
     }
   };
+  
 
   if (loading) {
     return (

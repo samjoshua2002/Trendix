@@ -10,7 +10,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
-  const [ setError] = useState('');
+  const [s, setError] = useState('');
 
   const calculateOfferPercent = (original, discounted) => {
     return Math.round(((original - discounted) / original) * 100);
@@ -24,7 +24,7 @@ const Cart = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8081/user/profile/${email}`);
+        const response = await axios.get(`${BASE_URL}/user/profile/${email}`);
         setProfile(response.data);
       } catch (err) {
         setError('Failed to load profile');

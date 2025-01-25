@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { User, UserCircle, Mail, Phone, Trash2 } from 'lucide-react';
+import { BASE_URL } from '../App';
 
 function Profile() {
   const navigate = useNavigate();

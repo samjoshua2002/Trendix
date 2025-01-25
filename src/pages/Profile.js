@@ -9,6 +9,7 @@ function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,13 +40,12 @@ function Profile() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!profile || !window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      return;
-    }
-  
+    if (!profile) return;
+
     try {
-      const email = profile.useremail; 
+      const email = profile.useremail;
       await axios.delete(`${BASE_URL}/user/deleteuser/${email}`);
+      setShowModal(false);
       alert('Your account has been deleted successfully.');
       handleSignOut();
     } catch (err) {
@@ -53,7 +53,6 @@ function Profile() {
       console.error('Error deleting account:', err);
     }
   };
-  
 
   if (loading) {
     return (
@@ -128,7 +127,7 @@ function Profile() {
                 </button>
                 
                 <button 
-                  onClick={handleDeleteAccount}
+                  onClick={() => setShowModal(true)}
                   className="w-full rounded-md py-2 text-center border-2 border-[#E23378] text-[#E23378] font-medium hover:bg-[#E23378] hover:text-white transition-colors flex items-center justify-center space-x-2"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -139,6 +138,32 @@ function Profile() {
           )}
         </div>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Confirm Deletion</h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete your account? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button 
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-[#E23378] text-white rounded-md hover:bg-[#c62c68] transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

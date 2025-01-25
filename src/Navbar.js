@@ -5,6 +5,7 @@ import { Home, ShoppingCart, Heart, Info, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "./App";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Navbar() {
 
       try {
         const response = await axios.get(
-          `http://localhost:8081/user/profile/${email}`
+          `${BASE_URL}/user/profile/${email}`
         );
         setProfile(response.data);
       } catch (err) {

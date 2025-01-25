@@ -19,7 +19,7 @@ function Profile() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8081/user/profile/${email}`);
+        const response = await axios.get(`${BASE_URL}/user/profile/${email}`);
         setProfile(response.data);
       } catch (err) {
         setError('Failed to load profile');

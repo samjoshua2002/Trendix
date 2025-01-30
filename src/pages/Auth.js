@@ -36,6 +36,8 @@ const Landing2 = () => {
     register: false,
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
@@ -57,10 +59,12 @@ const Landing2 = () => {
   };
 
   const sendOTP = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    setIsLoading(true);
 
     if (!user.username || !user.useremail || !user.usernumber) {
       toast.error("Please fill in all required fields");
+      setIsLoading(false);
       return;
     }
 
@@ -81,13 +85,18 @@ const Landing2 = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to send OTP. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const verifyOTP = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    setIsLoading(true);
+
     if (!user.userotp) {
       toast.error("Please enter the OTP");
+      setIsLoading(false);
       return;
     }
 
@@ -106,13 +115,37 @@ const Landing2 = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to verify OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async (e) => {
+    e?.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(`${BASE_URL}/user/resendotp/${user.useremail}`);
+      if (response.data === "otp sent") {
+        toast.success("Your OTP is sent to your mail " + user.useremail);
+      } else {
+        toast.error("Check the connection");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to resend OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const completeRegistration = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    setIsLoading(true);
+
     if (!user.userpassword) {
       toast.error("Please enter a password");
+      setIsLoading(false);
       return;
     }
 
@@ -132,6 +165,8 @@ const Landing2 = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to complete registration. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -161,10 +196,13 @@ const Landing2 = () => {
   };
 
   const onSignin = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    setIsLoading(true);
+
     try {
       if (!userin.useremail || !userin.userpassword) {
         toast.error("Enter your registered email and password!");
+        setIsLoading(false);
         return;
       }
       const response = await axios.get(
@@ -192,11 +230,15 @@ const Landing2 = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to sign in. Please check your connection.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const password = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    setIsLoading(true);
+
     try {
       if (userin.useremail) {
         const response = await axios.get(
@@ -210,6 +252,8 @@ const Landing2 = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to send password reset email. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -219,13 +263,38 @@ const Landing2 = () => {
     }
   }, [navigate]);
 
+  // Auto-submit logic for OTP and password fields
+  useEffect(() => {
+    if (registrationStep === "otpSent" && user.userotp.length === 6) {
+      verifyOTP();
+    } else if (registrationStep === "otpVerified" && user.userpassword.length >= 8) {
+      completeRegistration();
+    }
+  }, [user.userotp, user.userpassword, registrationStep]);
+
+  // Handle "Enter" key press
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (change.signIn) {
+        onSignin();
+      } else {
+        if (registrationStep === "initial") {
+          sendOTP();
+        } else if (registrationStep === "otpSent") {
+          verifyOTP();
+        } else if (registrationStep === "otpVerified") {
+          completeRegistration();
+        }
+      }
+    }
+  };
+
   return (
     <>
       <ToastContainer />
-      <div className="min-h-screen w-full flex">
+      <div className="min-h-screen w-full flex flex-col lg:flex-row">
         {/* Left side - Form */}
-        <div className="w-full lg:w-1/2 min-h-screen  flex items-center justify-center p-4">
-          {/* bg-[#F2F3F7] */}
+        <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-4 bg-gray-50">
           <div className="w-full max-w-md">
             <div className="px-6 py-8 md:px-8">
               <h1
@@ -240,7 +309,7 @@ const Landing2 = () => {
                   <h2 className="text-gray-800 text-2xl text-center mb-8 font-medium">
                     Welcome Back
                   </h2>
-                  <div className="space-y-6">
+                  <div className="space-y-6" onKeyDown={handleKeyDown}>
                     <TextInput
                       className="w-full bg-gray-50"
                       name="useremail"
@@ -262,12 +331,14 @@ const Landing2 = () => {
                     <div className="flex items-center justify-between text-sm">
                       <button
                         onClick={password}
+                        disabled={isLoading}
                         className="text-gray-600 hover:text-[#E23378] transition-colors"
                       >
                         Forgot Password?
                       </button>
                       <button
                         onClick={signup}
+                        disabled={isLoading}
                         className="text-gray-600 hover:text-[#E23378] transition-colors"
                       >
                         New User? Sign Up
@@ -276,16 +347,17 @@ const Landing2 = () => {
 
                     <button
                       onClick={onSignin}
+                      disabled={isLoading}
                       className="w-full py-3 px-4 bg-[#E23378] text-white rounded-lg font-medium 
                              hover:bg-[#E23378]/90 transform hover:scale-[1.02] transition-all duration-200
                              focus:outline-none focus:ring-2 focus:ring-[#E23378] focus:ring-offset-2"
                     >
-                      Sign In
+                      {isLoading ? "Signing In..." : "Sign In"}
                     </button>
                   </div>
                 </>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-6" onKeyDown={handleKeyDown}>
                   <h2 className="text-gray-800 text-2xl text-center mb-8 font-medium">
                     Create Account
                   </h2>
@@ -349,11 +421,24 @@ const Landing2 = () => {
                   <div className="flex justify-between items-center">
                     <button
                       onClick={signin}
+                      disabled={isLoading}
                       className="text-gray-600 text-sm hover:text-[#E23378] transition-colors"
                     >
                       Already have an account? Sign In
                     </button>
                   </div>
+
+                  {registrationStep === "otpSent" && (
+                    <button
+                      onClick={resendOtp}
+                      disabled={isLoading}
+                      className="w-full py-3 px-4 bg-[#E23378] text-white rounded-lg font-medium 
+                             hover:bg-[#E23378]/90 transform hover:scale-[1.02] transition-all duration-200
+                             focus:outline-none focus:ring-2 focus:ring-[#E23378] focus:ring-offset-2"
+                    >
+                      {isLoading ? "Resending OTP..." : "Resend OTP"}
+                    </button>
+                  )}
 
                   <button
                     onClick={
@@ -363,11 +448,14 @@ const Landing2 = () => {
                         ? verifyOTP
                         : completeRegistration
                     }
+                    disabled={isLoading}
                     className="w-full py-3 px-4 bg-[#E23378] text-white rounded-lg font-medium 
                            hover:bg-[#E23378]/90 transform hover:scale-[1.02] transition-all duration-200
                            focus:outline-none focus:ring-2 focus:ring-[#E23378] focus:ring-offset-2"
                   >
-                    {registrationStep === "initial"
+                    {isLoading
+                      ? "Processing..."
+                      : registrationStep === "initial"
                       ? "Send OTP"
                       : registrationStep === "otpSent"
                       ? "Verify OTP"
@@ -379,7 +467,7 @@ const Landing2 = () => {
           </div>
         </div>
 
-        {/* Right side - Image (hidden on mobile) */}
+        {/* Right side - Video (hidden on mobile) */}
         <div className="hidden lg:block w-1/2 relative">
           <video
             className="absolute inset-0 w-full h-[100vh] object-cover border-none"
@@ -387,7 +475,6 @@ const Landing2 = () => {
             loop
             muted
             playsInline
-            
           >
             <source src={videoSource} type="video/mp4" />
             Your browser does not support the video tag.
